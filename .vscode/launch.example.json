@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "ERP (Mock local)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart"
+    },
+    {
+      "name": "ERP (Supabase)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "toolArgs": [
+        "--dart-define=USE_MOCK=false",
+        "--dart-define=SUPABASE_URL=https://TU_PROYECTO.supabase.co",
+        "--dart-define=SUPABASE_ANON_KEY=TU_ANON_KEY"
+      ]
+    }
+  ]
+}
