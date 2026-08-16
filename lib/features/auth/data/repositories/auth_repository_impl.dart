@@ -16,12 +16,17 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
   }) async {
     try {
-      final usuario = await remote.iniciarSesion(email: email, password: password);
+      final usuario = await remote.iniciarSesion(
+        email: email,
+        password: password,
+      );
       return Right(usuario);
     } on AuthException catch (e) {
       return Left(ReglaDeNegocioFailure(e.message));
     } catch (e) {
-      return Left(ReglaDeNegocioFailure(AuthRemoteDatasource.mensajeAmigable(e)));
+      return Left(
+        ReglaDeNegocioFailure(AuthRemoteDatasource.mensajeAmigable(e)),
+      );
     }
   }
 
@@ -31,13 +36,13 @@ class AuthRepositoryImpl implements AuthRepository {
       final usuario = await remote.iniciarSesionConGoogle();
       return Right(usuario);
     } on GoogleRedirectPending {
-      return const Left(
-        ReglaDeNegocioFailure('Redirigiendo a Google…'),
-      );
+      return const Left(ReglaDeNegocioFailure('Redirigiendo a Google…'));
     } on AuthException catch (e) {
       return Left(ReglaDeNegocioFailure(e.message));
     } catch (e) {
-      return Left(ReglaDeNegocioFailure(AuthRemoteDatasource.mensajeAmigable(e)));
+      return Left(
+        ReglaDeNegocioFailure(AuthRemoteDatasource.mensajeAmigable(e)),
+      );
     }
   }
 
@@ -47,7 +52,9 @@ class AuthRepositoryImpl implements AuthRepository {
       await remote.cerrarSesion();
       return const Right(null);
     } catch (e) {
-      return Left(ReglaDeNegocioFailure(AuthRemoteDatasource.mensajeAmigable(e)));
+      return Left(
+        ReglaDeNegocioFailure(AuthRemoteDatasource.mensajeAmigable(e)),
+      );
     }
   }
 

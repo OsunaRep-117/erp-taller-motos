@@ -16,12 +16,21 @@ class ActualizarHorasFacturables {
   }) {
     if (orden.esInmutable) {
       return Future.value(
-        const Left(ReglaDeNegocioFailure('Esta orden ya no admite cambios de mano de obra.')),
+        const Left(
+          ReglaDeNegocioFailure(
+            'Esta orden ya no admite cambios de mano de obra.',
+          ),
+        ),
       );
     }
     if (horas < 0) {
-      return Future.value(const Left(ReglaDeNegocioFailure('Las horas no pueden ser negativas.')));
+      return Future.value(
+        const Left(ReglaDeNegocioFailure('Las horas no pueden ser negativas.')),
+      );
     }
-    return repository.actualizarHorasFacturables(idOrden: orden.id, horas: horas);
+    return repository.actualizarHorasFacturables(
+      idOrden: orden.id,
+      horas: horas,
+    );
   }
 }

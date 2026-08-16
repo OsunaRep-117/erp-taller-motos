@@ -12,4 +12,13 @@ abstract class ComprasDataSource {
     required String idProveedor,
   });
   Future<List<Map<String, dynamic>>> listarEntradas();
+
+  Future<List<Map<String, dynamic>>> listarOrdenesCompra();
+  Future<List<Map<String, dynamic>>> detalleOrdenCompra(String idCompra);
+  Future<Map<String, dynamic>> crearOrdenCompra({
+    required String idProveedor,
+    required List<Map<String, dynamic>> items,
+  });
+  Future<Map<String, dynamic>> aprobarOrdenCompra(String idCompra);
+  Future<void> recibirOrdenCompra(String idCompra);
 }

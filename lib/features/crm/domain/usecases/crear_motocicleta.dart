@@ -23,15 +23,21 @@ class CrearMotocicleta {
 
     if (vinLimpio.length != 17) {
       return Future.value(
-        const Left(ReglaDeNegocioFailure('El VIN debe tener exactamente 17 caracteres.')),
+        const Left(
+          ReglaDeNegocioFailure('El VIN debe tener exactamente 17 caracteres.'),
+        ),
       );
     }
     if (placa.trim().isEmpty) {
-      return Future.value(const Left(ReglaDeNegocioFailure('La placa es obligatoria.')));
+      return Future.value(
+        const Left(ReglaDeNegocioFailure('La placa es obligatoria.')),
+      );
     }
     final anioActual = DateTime.now().year;
     if (anio < 1980 || anio > anioActual + 1) {
-      return Future.value(const Left(ReglaDeNegocioFailure('Año de fabricación inválido.')));
+      return Future.value(
+        const Left(ReglaDeNegocioFailure('Año de fabricación inválido.')),
+      );
     }
 
     return repository.crearMotocicleta(

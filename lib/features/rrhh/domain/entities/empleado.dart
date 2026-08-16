@@ -5,7 +5,7 @@ part 'empleado.freezed.dart';
 part 'empleado.g.dart';
 
 @freezed
-class Empleado with _$Empleado {
+abstract class Empleado with _$Empleado {
   const factory Empleado({
     required String id,
     required String nombre,
@@ -15,5 +15,6 @@ class Empleado with _$Empleado {
     required DateTime fechaContratacion,
   }) = _Empleado;
 
-  factory Empleado.fromJson(Map<String, dynamic> json) => _$EmpleadoFromJson(json);
+  factory Empleado.fromJson(Map<String, dynamic> json) =>
+      _$EmpleadoFromJson(json);
 }

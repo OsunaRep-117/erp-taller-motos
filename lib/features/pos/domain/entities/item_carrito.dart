@@ -21,11 +21,11 @@ class ItemCarrito extends Equatable {
   double get subtotal => cantidad * precioUnitario;
 
   ItemCarrito copyWith({int? cantidad, double? precioUnitario}) => ItemCarrito(
-        sku: sku,
-        nombre: nombre,
-        cantidad: cantidad ?? this.cantidad,
-        precioUnitario: precioUnitario ?? this.precioUnitario,
-      );
+    sku: sku,
+    nombre: nombre,
+    cantidad: cantidad ?? this.cantidad,
+    precioUnitario: precioUnitario ?? this.precioUnitario,
+  );
 
   @override
   List<Object?> get props => [sku, nombre, cantidad, precioUnitario];

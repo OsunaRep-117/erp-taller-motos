@@ -18,14 +18,22 @@ class CrearCliente {
     bool esFlotilla = false,
   }) {
     if (nombreCompleto.trim().isEmpty) {
-      return Future.value(const Left(ReglaDeNegocioFailure('El nombre es obligatorio.')));
+      return Future.value(
+        const Left(ReglaDeNegocioFailure('El nombre es obligatorio.')),
+      );
     }
     if (telefono.trim().isEmpty) {
-      return Future.value(const Left(ReglaDeNegocioFailure('El teléfono es obligatorio.')));
+      return Future.value(
+        const Left(ReglaDeNegocioFailure('El teléfono es obligatorio.')),
+      );
     }
     if (esFlotilla && (rfc == null || rfc.trim().isEmpty)) {
       return Future.value(
-        const Left(ReglaDeNegocioFailure('El RFC es obligatorio para clientes de flotilla.')),
+        const Left(
+          ReglaDeNegocioFailure(
+            'El RFC es obligatorio para clientes de flotilla.',
+          ),
+        ),
       );
     }
 

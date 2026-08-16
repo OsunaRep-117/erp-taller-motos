@@ -32,27 +32,34 @@ void main() {
       );
 
       expect(resultado.isLeft(), true);
-      verifyNever(() => repository.registrarPago(
-        idOrden: any(named: 'idOrden'),
-        monto: any(named: 'monto'),
-        metodoPago: any(named: 'metodoPago'),
-      ));
-    });
-
-    test('delega al repositorio con monto válido (la validación de saldo la hace el servidor)', () async {
-      when(() => repository.registrarPago(
-        idOrden: 'ORD-1',
-        monto: 500,
-        metodoPago: MetodoPago.efectivo,
-      )).thenAnswer((_) async => const Right(null));
-
-      final resultado = await useCase(
-        idOrden: 'ORD-1',
-        monto: 500,
-        metodoPago: MetodoPago.efectivo,
+      verifyNever(
+        () => repository.registrarPago(
+          idOrden: any(named: 'idOrden'),
+          monto: any(named: 'monto'),
+          metodoPago: any(named: 'metodoPago'),
+        ),
       );
-
-      expect(resultado, const Right(null));
     });
+
+    test(
+      'delega al repositorio con monto válido (la validación de saldo la hace el servidor)',
+      () async {
+        when(
+          () => repository.registrarPago(
+            idOrden: 'ORD-1',
+            monto: 500,
+            metodoPago: MetodoPago.efectivo,
+          ),
+        ).thenAnswer((_) async => const Right(null));
+
+        final resultado = await useCase(
+          idOrden: 'ORD-1',
+          monto: 500,
+          metodoPago: MetodoPago.efectivo,
+        );
+
+        expect(resultado, const Right(null));
+      },
+    );
   });
 }

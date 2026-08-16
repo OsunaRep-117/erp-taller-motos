@@ -4,7 +4,7 @@ part 'motocicleta.freezed.dart';
 part 'motocicleta.g.dart';
 
 @freezed
-class Motocicleta with _$Motocicleta {
+abstract class Motocicleta with _$Motocicleta {
   const factory Motocicleta({
     required String vin,
     required String placa,
@@ -14,5 +14,6 @@ class Motocicleta with _$Motocicleta {
     required String idCliente,
   }) = _Motocicleta;
 
-  factory Motocicleta.fromJson(Map<String, dynamic> json) => _$MotocicletaFromJson(json);
+  factory Motocicleta.fromJson(Map<String, dynamic> json) =>
+      _$MotocicletaFromJson(json);
 }

@@ -15,10 +15,15 @@ class MockAuthRepositoryImpl implements AuthRepository {
     required String password,
   }) async {
     try {
-      final usuario = await remote.iniciarSesion(email: email, password: password);
+      final usuario = await remote.iniciarSesion(
+        email: email,
+        password: password,
+      );
       return Right(usuario);
     } catch (e) {
-      return Left(ReglaDeNegocioFailure(e.toString().replaceFirst('Exception: ', '')));
+      return Left(
+        ReglaDeNegocioFailure(e.toString().replaceFirst('Exception: ', '')),
+      );
     }
   }
 
@@ -28,7 +33,9 @@ class MockAuthRepositoryImpl implements AuthRepository {
       final usuario = await remote.iniciarSesionConGoogle();
       return Right(usuario);
     } catch (e) {
-      return Left(ReglaDeNegocioFailure(e.toString().replaceFirst('Exception: ', '')));
+      return Left(
+        ReglaDeNegocioFailure(e.toString().replaceFirst('Exception: ', '')),
+      );
     }
   }
 

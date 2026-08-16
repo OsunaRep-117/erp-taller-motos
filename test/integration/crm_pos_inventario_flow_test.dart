@@ -43,13 +43,20 @@ void main() {
     final stockAntes = antes.getOrElse(() => throw StateError('')).stockActual;
 
     final venta = await h.registrarVenta([
-      const ItemCarrito(sku: sku, nombre: 'Aceite 10W40', cantidad: 1, precioUnitario: 150),
+      const ItemCarrito(
+        sku: sku,
+        nombre: 'Aceite 10W40',
+        cantidad: 1,
+        precioUnitario: 150,
+      ),
     ], metodoPago: 'efectivo');
 
     expect(venta.isRight(), true);
 
     final despues = await h.inventarioRepo.obtenerPorSku(sku);
-    final stockDespues = despues.getOrElse(() => throw StateError('')).stockActual;
+    final stockDespues = despues
+        .getOrElse(() => throw StateError(''))
+        .stockActual;
     expect(stockDespues, stockAntes - 1);
   });
 
@@ -70,7 +77,10 @@ void main() {
     expect(result, const Right(null));
 
     final despues = await h.inventarioRepo.obtenerPorSku(sku);
-    expect(despues.getOrElse(() => throw StateError('')).stockActual, stockAntes + 2);
+    expect(
+      despues.getOrElse(() => throw StateError('')).stockActual,
+      stockAntes + 2,
+    );
   });
 
   test('flujo compras: registrar entrada incrementa stock', () async {
@@ -90,6 +100,9 @@ void main() {
     expect(result.isRight(), true);
 
     final despues = await h.inventarioRepo.obtenerPorSku(sku);
-    expect(despues.getOrElse(() => throw StateError('')).stockActual, stockAntes + 5);
+    expect(
+      despues.getOrElse(() => throw StateError('')).stockActual,
+      stockAntes + 5,
+    );
   });
 }

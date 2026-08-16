@@ -31,22 +31,34 @@ class ComprasHomeScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          ListTile(
+            leading: const Icon(Icons.receipt_long_outlined),
+            title: const Text('Órdenes de compra'),
+            subtitle: const Text('Flujo borrador → aprobada → recibida'),
+            onTap: () => context.go('/compras/ordenes'),
+          ),
+          const Divider(),
           Text('Proveedores', style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
           AsyncValueView(
             value: proveedoresAsync,
             builder: (proveedores) => Column(
               children: proveedores
-                  .map((p) => ListTile(
-                        leading: const Icon(Icons.local_shipping_outlined),
-                        title: Text(p.nombre),
-                        subtitle: Text(p.contacto),
-                      ))
+                  .map(
+                    (p) => ListTile(
+                      leading: const Icon(Icons.local_shipping_outlined),
+                      title: Text(p.nombre),
+                      subtitle: Text(p.contacto),
+                    ),
+                  )
                   .toList(),
             ),
           ),
           const SizedBox(height: 24),
-          Text('Historial de entradas', style: Theme.of(context).textTheme.titleMedium),
+          Text(
+            'Historial de entradas',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
           const SizedBox(height: 8),
           AsyncValueView(
             value: entradasAsync,
@@ -54,11 +66,13 @@ class ComprasHomeScreen extends ConsumerWidget {
             isEmpty: (e) => e.isEmpty,
             builder: (entradas) => Column(
               children: entradas
-                  .map((e) => ListTile(
-                        leading: const Icon(Icons.move_to_inbox),
-                        title: Text('${e['sku']} x${e['cantidad']}'),
-                        subtitle: Text('Costo: \$${e['costo_unitario']}'),
-                      ))
+                  .map(
+                    (e) => ListTile(
+                      leading: const Icon(Icons.move_to_inbox),
+                      title: Text('${e['sku']} x${e['cantidad']}'),
+                      subtitle: Text('Costo: \$${e['costo_unitario']}'),
+                    ),
+                  )
                   .toList(),
             ),
           ),

@@ -9,7 +9,9 @@ abstract class RrhhRepository {
   /// El cálculo real ocurre en un trigger de base de datos al pagar la
   /// OT (Sección 5.5 del documento maestro); este repositorio solo
   /// consulta lo ya generado, no lo calcula desde el cliente.
-  Future<Either<Failure, List<Comision>>> listarComisionesDeMecanico(String idMecanico);
+  Future<Either<Failure, List<Comision>>> listarComisionesDeMecanico(
+    String idMecanico,
+  );
 
   /// Solo para Admin: vista de productividad de todos los mecánicos.
   Future<Either<Failure, List<Comision>>> listarTodasLasComisiones();
@@ -22,11 +24,14 @@ abstract class RrhhRepository {
     required String email,
     required String rol,
   });
-  
-  Future<Either<Failure, void>> actualizarRolEmpleado(String idEmpleado, String nuevoRol);
-  
+
+  Future<Either<Failure, void>> actualizarRolEmpleado(
+    String idEmpleado,
+    String nuevoRol,
+  );
+
   Future<Either<Failure, void>> desactivarEmpleado(String idEmpleado);
-  
+
   Future<Either<Failure, EmpleadoInvitacion>> invitarEmpleadoGoogle({
     required String nombre,
     required String email,
@@ -34,7 +39,8 @@ abstract class RrhhRepository {
     required String invitadoPorId,
   });
 
-  Future<Either<Failure, List<EmpleadoInvitacion>>> listarInvitacionesPendientes();
+  Future<Either<Failure, List<EmpleadoInvitacion>>>
+  listarInvitacionesPendientes();
 
   Future<Either<Failure, void>> cancelarInvitacion(String idInvitacion);
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -22,8 +24,13 @@ Future<void> main() async {
       url: AppConfig.supabaseUrl,
       anonKey: AppConfig.supabaseAnonKey,
     );
-    // Tras OAuth (web URL o deep link móvil) validar acceso al ERP.
-    await AuthRemoteDatasource(Supabase.instance.client).obtenerUsuarioActual();
+    // Validamos el acceso al ERP en segundo plano (no con await) para no
+    // bloquear el arranque completo de la app si la RPC resolver_acceso_empleado
+    // tarda o falla intermitentemente. El stream reactivo de authState ya
+    // recoge el resultado final y el router reacciona a él normalmente.
+    unawaited(
+      AuthRemoteDatasource(Supabase.instance.client).obtenerUsuarioActual(),
+    );
   }
 
   runApp(const ProviderScope(child: ErpTallerApp()));

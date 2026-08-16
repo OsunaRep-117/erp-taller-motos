@@ -13,7 +13,9 @@ class CancelarOrden {
     required String motivo,
   }) async {
     if (motivo.trim().isEmpty) {
-      return const Left(ReglaDeNegocioFailure('Debes indicar el motivo de cancelación.'));
+      return const Left(
+        ReglaDeNegocioFailure('Debes indicar el motivo de cancelación.'),
+      );
     }
     return repository.cancelarOrden(idOrden: idOrden, motivo: motivo);
   }

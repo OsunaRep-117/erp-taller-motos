@@ -106,7 +106,11 @@ class AppTheme {
             borderRadius: BorderRadius.circular(2),
             side: const BorderSide(color: XpColors.borderDark),
           ),
-          textStyle: const TextStyle(fontFamily: 'Tahoma', fontSize: 13, fontWeight: FontWeight.w600),
+          textStyle: const TextStyle(
+            fontFamily: 'Tahoma',
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
@@ -119,7 +123,10 @@ class AppTheme {
         iconColor: XpColors.titleStart,
         textColor: Color(0xFF1A1A1A),
       ),
-      dividerTheme: const DividerThemeData(color: XpColors.borderDark, thickness: 1),
+      dividerTheme: const DividerThemeData(
+        color: XpColors.borderDark,
+        thickness: 1,
+      ),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: XpColors.panelBg,
         contentTextStyle: const TextStyle(color: Colors.black87),

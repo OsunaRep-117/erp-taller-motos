@@ -17,7 +17,8 @@ class RefaccionDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final refaccionAsync = ref.watch(refaccionPorSkuProvider(sku));
     final user = ref.watch(authStateProvider).valueOrNull;
-    final puedeVerCostos = user != null && AppPermissions.puedeVerCostos(user.rol);
+    final puedeVerCostos =
+        user != null && AppPermissions.puedeVerCostos(user.rol);
 
     return AppScaffold(
       title: 'Refacción $sku',
@@ -33,41 +34,62 @@ class RefaccionDetailScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(ref.nombre, style: Theme.of(context).textTheme.titleLarge),
+                      Text(
+                        ref.nombre,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
                       const SizedBox(height: 8),
                       Text('SKU: ${ref.sku}'),
-                      if (puedeVerCostos) Text('Costo: \$${ref.precioCosto.toStringAsFixed(2)}'),
-                      Text('Precio venta: \$${ref.precioVenta.toStringAsFixed(2)}'),
+                      if (puedeVerCostos)
+                        Text('Costo: \$${ref.precioCosto.toStringAsFixed(2)}'),
+                      Text(
+                        'Precio venta: \$${ref.precioVenta.toStringAsFixed(2)}',
+                      ),
                       Text('Stock actual: ${ref.stockActual}'),
                       Text('Reservado: ${ref.stockReservado}'),
                       Text('Disponible: ${ref.stockDisponible}'),
                       Text('Mínimo: ${ref.stockMinimo}'),
                       if (ref.requiereReorden)
-                        const Chip(label: Text('Requiere reorden'), backgroundColor: Color(0xFFFAC775)),
+                        const Chip(
+                          label: Text('Requiere reorden'),
+                          backgroundColor: Color(0xFFFAC775),
+                        ),
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 16),
-              Text('Entradas de compra', style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                'Entradas de compra',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               if (historial.entradas.isEmpty)
                 const Text('Sin entradas registradas.')
               else
-                ...historial.entradas.map((e) => ListTile(
-                      leading: const Icon(Icons.move_to_inbox),
-                      title: Text('+${e.cantidad} unidades'),
-                      subtitle: Text('Costo unit: \$${e.costoUnitario} · ${e.fecha}'),
-                    )),
+                ...historial.entradas.map(
+                  (e) => ListTile(
+                    leading: const Icon(Icons.move_to_inbox),
+                    title: Text('+${e.cantidad} unidades'),
+                    subtitle: Text(
+                      'Costo unit: \$${e.costoUnitario} · ${e.fecha}',
+                    ),
+                  ),
+                ),
               const SizedBox(height: 16),
-              Text('Ajustes manuales', style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                'Ajustes manuales',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               if (historial.ajustes.isEmpty)
                 const Text('Sin ajustes registrados.')
               else
-                ...historial.ajustes.map((a) => ListTile(
-                      leading: Icon(a.cantidad >= 0 ? Icons.add : Icons.remove),
-                      title: Text('${a.cantidad >= 0 ? '+' : ''}${a.cantidad}'),
-                      subtitle: Text('${a.justificacion}\n${a.fecha}'),
-                    )),
+                ...historial.ajustes.map(
+                  (a) => ListTile(
+                    leading: Icon(a.cantidad >= 0 ? Icons.add : Icons.remove),
+                    title: Text('${a.cantidad >= 0 ? '+' : ''}${a.cantidad}'),
+                    subtitle: Text('${a.justificacion}\n${a.fecha}'),
+                  ),
+                ),
             ],
           );
         },

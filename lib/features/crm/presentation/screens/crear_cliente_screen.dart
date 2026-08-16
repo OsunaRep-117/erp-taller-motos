@@ -68,50 +68,56 @@ class _CrearClienteScreenState extends ConsumerState<CrearClienteScreen> {
             title: 'Registro de cliente',
             maxWidth: 480,
             child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextField(
-                controller: _nombreController,
-                decoration: const InputDecoration(labelText: 'Nombre completo'),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _telefonoController,
-                decoration: const InputDecoration(labelText: 'Teléfono'),
-                keyboardType: TextInputType.phone,
-              ),
-              const SizedBox(height: 12),
-              SwitchListTile(
-                title: const Text('Cliente de flotilla (B2B)'),
-                value: _esFlotilla,
-                onChanged: (v) => setState(() => _esFlotilla = v),
-                contentPadding: EdgeInsets.zero,
-              ),
-              if (_esFlotilla) ...[
-                const SizedBox(height: 4),
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
                 TextField(
-                  controller: _rfcController,
+                  controller: _nombreController,
                   decoration: const InputDecoration(
-                    labelText: 'RFC (obligatorio para flotilla)',
+                    labelText: 'Nombre completo',
                   ),
                 ),
-              ],
-              const SizedBox(height: 20),
-              if (_error != null) ...[
-                Text(_error!, style: const TextStyle(color: Colors.red)),
                 const SizedBox(height: 12),
+                TextField(
+                  controller: _telefonoController,
+                  decoration: const InputDecoration(labelText: 'Teléfono'),
+                  keyboardType: TextInputType.phone,
+                ),
+                const SizedBox(height: 12),
+                SwitchListTile(
+                  title: const Text('Cliente de flotilla (B2B)'),
+                  value: _esFlotilla,
+                  onChanged: (v) => setState(() => _esFlotilla = v),
+                  contentPadding: EdgeInsets.zero,
+                ),
+                if (_esFlotilla) ...[
+                  const SizedBox(height: 4),
+                  TextField(
+                    controller: _rfcController,
+                    decoration: const InputDecoration(
+                      labelText: 'RFC (obligatorio para flotilla)',
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 20),
+                if (_error != null) ...[
+                  Text(_error!, style: const TextStyle(color: Colors.red)),
+                  const SizedBox(height: 12),
+                ],
+                FilledButton(
+                  onPressed: _guardando ? null : _guardar,
+                  child: _guardando
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Guardar cliente'),
+                ),
               ],
-              FilledButton(
-                onPressed: _guardando ? null : _guardar,
-                child: _guardando
-                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                    : const Text('Guardar cliente'),
-              ),
-            ],
+            ),
           ),
         ),
       ),
-    ),
     );
   }
 }

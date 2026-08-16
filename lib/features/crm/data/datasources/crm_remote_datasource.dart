@@ -9,7 +9,10 @@ class CrmRemoteDatasource implements CrmDataSource {
   const CrmRemoteDatasource(this.client);
 
   Future<List<Cliente>> listarClientes() async {
-    final data = await client.from('clientes').select().order('nombre_completo');
+    final data = await client
+        .from('clientes')
+        .select()
+        .order('nombre_completo');
     return data.map(_clienteFromJson).toList();
   }
 
@@ -60,7 +63,11 @@ class CrmRemoteDatasource implements CrmDataSource {
   }
 
   Future<Motocicleta> obtenerMotocicletaPorVin(String vin) async {
-    final data = await client.from('motocicletas').select().eq('vin', vin).single();
+    final data = await client
+        .from('motocicletas')
+        .select()
+        .eq('vin', vin)
+        .single();
     return _motoFromJson(data);
   }
 
@@ -111,21 +118,39 @@ class CrmRemoteDatasource implements CrmDataSource {
     return _motoFromJson(data);
   }
 
+  @override
+  Future<double> calcularExposicionCredito(String idCliente) async {
+    final result = await client.rpc(
+      'calcular_exposicion_credito',
+      params: {'p_id_cliente': idCliente},
+    );
+    return (result as num).toDouble();
+  }
+
+  @override
+  Future<bool> clienteFlotillaMoroso(String idCliente) async {
+    final result = await client.rpc(
+      'cliente_flotilla_moroso',
+      params: {'p_id_cliente': idCliente},
+    );
+    return result as bool;
+  }
+
   Cliente _clienteFromJson(Map<String, dynamic> json) => Cliente(
-        id: json['id'] as String,
-        nombreCompleto: json['nombre_completo'] as String,
-        telefono: json['telefono'] as String,
-        rfc: json['rfc'] as String?,
-        limiteCredito: (json['limite_credito'] as num?)?.toDouble() ?? 0,
-        esFlotilla: json['es_flotilla'] as bool? ?? false,
-      );
+    id: json['id'] as String,
+    nombreCompleto: json['nombre_completo'] as String,
+    telefono: json['telefono'] as String,
+    rfc: json['rfc'] as String?,
+    limiteCredito: (json['limite_credito'] as num?)?.toDouble() ?? 0,
+    esFlotilla: json['es_flotilla'] as bool? ?? false,
+  );
 
   Motocicleta _motoFromJson(Map<String, dynamic> json) => Motocicleta(
-        vin: json['vin'] as String,
-        placa: json['placa'] as String,
-        marca: json['marca'] as String,
-        modelo: json['modelo'] as String,
-        anio: json['anio'] as int,
-        idCliente: json['id_cliente'] as String,
-      );
+    vin: json['vin'] as String,
+    placa: json['placa'] as String,
+    marca: json['marca'] as String,
+    modelo: json['modelo'] as String,
+    anio: json['anio'] as int,
+    idCliente: json['id_cliente'] as String,
+  );
 }

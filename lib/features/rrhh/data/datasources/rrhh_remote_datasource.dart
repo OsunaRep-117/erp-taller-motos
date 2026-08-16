@@ -20,20 +20,24 @@ class RrhhRemoteDatasource implements RrhhDataSource {
   }
 
   Future<List<Comision>> listarTodasLasComisiones() async {
-    final data = await client.from('comisiones').select().order('fecha_generada', ascending: false);
+    final data = await client
+        .from('comisiones')
+        .select()
+        .order('fecha_generada', ascending: false);
     return data.map(_fromJson).toList();
   }
 
   Comision _fromJson(Map<String, dynamic> json) => Comision(
-        id: json['id'] as String? ?? '',
-        idOrden: json['id_orden'] as String? ?? '',
-        idMecanico: json['id_mecanico'] as String? ?? '',
-        monto: (json['monto'] as num?)?.toDouble() ?? 0.0,
-        porcentajeAplicado: (json['porcentaje_aplicado'] as num?)?.toDouble() ?? 0.0,
-        fechaGenerada: json['fecha_generada'] != null 
-            ? DateTime.parse(json['fecha_generada'] as String) 
-            : DateTime.now(),
-      );
+    id: json['id'] as String? ?? '',
+    idOrden: json['id_orden'] as String? ?? '',
+    idMecanico: json['id_mecanico'] as String? ?? '',
+    monto: (json['monto'] as num?)?.toDouble() ?? 0.0,
+    porcentajeAplicado:
+        (json['porcentaje_aplicado'] as num?)?.toDouble() ?? 0.0,
+    fechaGenerada: json['fecha_generada'] != null
+        ? DateTime.parse(json['fecha_generada'] as String)
+        : DateTime.now(),
+  );
 
   Future<List<Empleado>> listarEmpleados() async {
     final data = await client.from('empleados').select().order('nombre');
@@ -43,14 +47,16 @@ class RrhhRemoteDatasource implements RrhhDataSource {
       final email = e['email'] as String? ?? 'Sin email';
       final rolStr = e['rol'] as String? ?? 'mecanico';
       final fechaStr = e['fecha_contratacion'] as String?;
-      
+
       return Empleado(
         id: id,
         nombre: nombre,
         email: email,
         rol: Usuario.rolFromString(rolStr),
         activo: e['activo'] as bool? ?? true,
-        fechaContratacion: fechaStr != null ? DateTime.parse(fechaStr) : DateTime.now(),
+        fechaContratacion: fechaStr != null
+            ? DateTime.parse(fechaStr)
+            : DateTime.now(),
       );
     }).toList();
   }
@@ -61,11 +67,11 @@ class RrhhRemoteDatasource implements RrhhDataSource {
     required String email,
     required RolEmpleado rol,
   }) async {
-    final data = await client.from('empleados').insert({
-      'nombre': nombre,
-      'email': email,
-      'rol': rol.name,
-    }).select().single();
+    final data = await client
+        .from('empleados')
+        .insert({'nombre': nombre, 'email': email, 'rol': rol.name})
+        .select()
+        .single();
     return Empleado(
       id: data['id'] as String,
       nombre: data['nombre'] as String,
@@ -76,11 +82,17 @@ class RrhhRemoteDatasource implements RrhhDataSource {
   }
 
   Future<void> actualizarRolEmpleado(String idEmpleado, String nuevoRol) async {
-    await client.from('empleados').update({'rol': nuevoRol}).eq('id', idEmpleado);
+    await client
+        .from('empleados')
+        .update({'rol': nuevoRol})
+        .eq('id', idEmpleado);
   }
 
   Future<void> desactivarEmpleado(String idEmpleado) async {
-    await client.from('empleados').update({'activo': false}).eq('id', idEmpleado);
+    await client
+        .from('empleados')
+        .update({'activo': false})
+        .eq('id', idEmpleado);
   }
 
   @override
@@ -110,15 +122,22 @@ class RrhhRemoteDatasource implements RrhhDataSource {
         .select()
         .eq('activado', false)
         .order('created_at', ascending: false);
-    return (data as List).map((e) => _invitacionFromJson(e as Map<String, dynamic>)).toList();
+    return (data as List)
+        .map((e) => _invitacionFromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   @override
   Future<void> cancelarInvitacion(String idInvitacion) async {
-    await client.from('empleados_invitados').delete().eq('id', idInvitacion).eq('activado', false);
+    await client
+        .from('empleados_invitados')
+        .delete()
+        .eq('id', idInvitacion)
+        .eq('activado', false);
   }
 
-  EmpleadoInvitacion _invitacionFromJson(Map<String, dynamic> json) => EmpleadoInvitacion(
+  EmpleadoInvitacion _invitacionFromJson(Map<String, dynamic> json) =>
+      EmpleadoInvitacion(
         id: json['id'] as String,
         email: json['email'] as String,
         nombre: json['nombre'] as String,

@@ -20,5 +20,12 @@ class Factura extends Equatable {
   });
 
   @override
-  List<Object?> get props => [id, idOrden, folioFiscal, rfcReceptor, estado, fechaEmision];
+  List<Object?> get props => [
+    id,
+    idOrden,
+    folioFiscal,
+    rfcReceptor,
+    estado,
+    fechaEmision,
+  ];
 }

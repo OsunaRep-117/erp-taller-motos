@@ -19,9 +19,6 @@ class AsignarMecanico {
     required String idOrden,
     required String idMecanico,
   }) {
-    return repository.asignarMecanico(
-      idOrden: idOrden,
-      idMecanico: idMecanico,
-    );
+    return repository.asignarMecanico(idOrden: idOrden, idMecanico: idMecanico);
   }
 }

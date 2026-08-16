@@ -8,5 +8,6 @@ class IniciarSesionConGoogle {
   final AuthRepository repository;
   const IniciarSesionConGoogle(this.repository);
 
-  Future<Either<Failure, Usuario>> call() => repository.iniciarSesionConGoogle();
+  Future<Either<Failure, Usuario>> call() =>
+      repository.iniciarSesionConGoogle();
 }

@@ -4,7 +4,12 @@ import 'dart:typed_data';
 import 'package:uuid/uuid.dart';
 
 import '../../../features/auth/domain/entities/usuario.dart';
+import '../../../features/compras/domain/entities/orden_compra.dart';
 import '../../../features/compras/domain/entities/proveedor.dart';
+import '../../../features/crm/domain/entities/cita.dart';
+import '../../../features/finanzas/domain/entities/gasto_operativo.dart';
+import '../../../features/inventario/domain/entities/movimiento_inventario.dart';
+import '../../../features/taller/domain/entities/extension_cotizacion.dart';
 import '../../../features/crm/domain/entities/cliente.dart';
 import '../../../features/crm/domain/entities/motocicleta.dart';
 import '../../../features/finanzas/domain/entities/factura.dart';
@@ -24,6 +29,7 @@ class MockDataStore {
   static const _uuid = Uuid();
   static const tarifaManoObraPorHora = 350.0;
   static const porcentajeComision = 0.08;
+  static const maxCitasPorHora = 3;
 
   Usuario? currentUser;
   final empleados = <Empleado>[];
@@ -39,9 +45,17 @@ class MockDataStore {
   final historialEstados = <HistorialEstado>[];
   final evidencias = <EvidenciaOt>[];
   final reservasPorOrden = <String, List<ReservaRefaccion>>{};
+  final consumosPorOrden = <String, List<ConsumoRefaccion>>{};
   final ventasPos = <VentaPos>[];
+  final cierresCaja = <CierreCajaRecord>[];
   final ajustesInventario = <AjusteInventario>[];
   final invitacionesEmpleados = <EmpleadoInvitacionRecord>[];
+  final citas = <Cita>[];
+  final ordenesCompra = <OrdenCompra>[];
+  final compraDetalle = <CompraDetalle>[];
+  final extensionesCotizacion = <ExtensionCotizacion>[];
+  final gastosOperativos = <GastoOperativo>[];
+  final movimientosInventario = <MovimientoInventario>[];
 
   String? _googleEmailSimulado;
   String? _googleNombreSimulado;
@@ -78,9 +92,17 @@ class MockDataStore {
     historialEstados.clear();
     evidencias.clear();
     reservasPorOrden.clear();
+    consumosPorOrden.clear();
     ventasPos.clear();
+    cierresCaja.clear();
     ajustesInventario.clear();
     invitacionesEmpleados.clear();
+    citas.clear();
+    ordenesCompra.clear();
+    compraDetalle.clear();
+    extensionesCotizacion.clear();
+    gastosOperativos.clear();
+    movimientosInventario.clear();
     _googleEmailSimulado = null;
     _googleNombreSimulado = null;
     _seeded = false;
@@ -196,8 +218,17 @@ class MockDataStore {
     ]);
 
     proveedores.addAll([
-      const Proveedor(id: 'prov-001', nombre: 'Refacciones del Norte', contacto: 'ventas@rdn.com'),
-      const Proveedor(id: 'prov-002', nombre: 'MotoPartes MX', contacto: '5551112233', rfc: 'MPM900101XYZ'),
+      const Proveedor(
+        id: 'prov-001',
+        nombre: 'Refacciones del Norte',
+        contacto: 'ventas@rdn.com',
+      ),
+      const Proveedor(
+        id: 'prov-002',
+        nombre: 'MotoPartes MX',
+        contacto: '5551112233',
+        rfc: 'MPM900101XYZ',
+      ),
     ]);
 
     final ot1 = OrdenTrabajo(
@@ -228,7 +259,12 @@ class MockDataStore {
 
   Usuario? empleadoToUsuario(Empleado emp) {
     if (!emp.activo) return null;
-    return Usuario(id: emp.id, email: emp.email, nombre: emp.nombre, rol: emp.rol);
+    return Usuario(
+      id: emp.id,
+      email: emp.email,
+      nombre: emp.nombre,
+      rol: emp.rol,
+    );
   }
 
   Usuario? login(String email, String password) {
@@ -246,7 +282,10 @@ class MockDataStore {
     return currentUser;
   }
 
-  void configurarGoogleSimulado({required String email, required String nombre}) {
+  void configurarGoogleSimulado({
+    required String email,
+    required String nombre,
+  }) {
     _googleEmailSimulado = email.trim().toLowerCase();
     _googleNombreSimulado = nombre.trim();
   }
@@ -262,7 +301,8 @@ class MockDataStore {
     final idxEmp = empleados.indexWhere((e) => e.id == authUserId);
     if (idxEmp >= 0) {
       final existente = empleados[idxEmp];
-      if (!existente.activo) throw Exception('Tu cuenta de empleado está desactivada.');
+      if (!existente.activo)
+        throw Exception('Tu cuenta de empleado está desactivada.');
       currentUser = empleadoToUsuario(existente);
       _authController.add(currentUser);
       return currentUser!;
@@ -313,7 +353,11 @@ class MockDataStore {
     final authId = 'google-${email.hashCode.abs()}';
     _googleEmailSimulado = null;
     _googleNombreSimulado = null;
-    return resolverAccesoGoogle(authUserId: authId, email: email, nombre: nombre);
+    return resolverAccesoGoogle(
+      authUserId: authId,
+      email: email,
+      nombre: nombre,
+    );
   }
 
   EmpleadoInvitacionRecord invitarEmpleadoGoogle({
@@ -356,8 +400,10 @@ class MockDataStore {
     return id;
   }
 
-  OrdenTrabajo _findOrden(String id) =>
-      ordenes.firstWhere((o) => o.id == id, orElse: () => throw Exception('Orden no encontrada.'));
+  OrdenTrabajo _findOrden(String id) => ordenes.firstWhere(
+    (o) => o.id == id,
+    orElse: () => throw Exception('Orden no encontrada.'),
+  );
 
   Refaccion _findRefaccion(String sku) {
     final idx = refacciones.indexWhere((r) => r.sku == sku && !r.inactivo);
@@ -382,14 +428,16 @@ class MockDataStore {
     EstadoOrdenTrabajo nuevo,
     String idUsuario,
   ) {
-    historialEstados.add(HistorialEstado(
-      id: _uuid.v4(),
-      idOrden: idOrden,
-      estadoAnterior: anterior,
-      estadoNuevo: nuevo,
-      fechaCambio: DateTime.now(),
-      idUsuario: idUsuario,
-    ));
+    historialEstados.add(
+      HistorialEstado(
+        id: _uuid.v4(),
+        idOrden: idOrden,
+        estadoAnterior: anterior,
+        estadoNuevo: nuevo,
+        fechaCambio: DateTime.now(),
+        idUsuario: idUsuario,
+      ),
+    );
   }
 
   OrdenTrabajo crearOrden({
@@ -410,10 +458,18 @@ class MockDataStore {
     return orden;
   }
 
-  int contarOrdenesEnProcesoDeMecanico(String idMecanico) =>
-      ordenes.where((o) => o.idMecanico == idMecanico && o.estado == EstadoOrdenTrabajo.enProceso).length;
+  int contarOrdenesEnProcesoDeMecanico(String idMecanico) => ordenes
+      .where(
+        (o) =>
+            o.idMecanico == idMecanico &&
+            o.estado == EstadoOrdenTrabajo.enProceso,
+      )
+      .length;
 
-  OrdenTrabajo asignarMecanico({required String idOrden, required String idMecanico}) {
+  OrdenTrabajo asignarMecanico({
+    required String idOrden,
+    required String idMecanico,
+  }) {
     if (contarOrdenesEnProcesoDeMecanico(idMecanico) >= 2) {
       throw Exception('El mecánico ya tiene 2 órdenes en proceso.');
     }
@@ -423,13 +479,22 @@ class MockDataStore {
       idMecanico: idMecanico,
       estado: EstadoOrdenTrabajo.enProceso,
       fechaInicioReparacion: DateTime.now(),
+      horasEstimadas: anterior.horasEstimadas > 0 ? anterior.horasEstimadas : 2,
     );
-    _registrarHistorial(idOrden, anterior.estado, actualizada.estado, requireUserId());
+    _registrarHistorial(
+      idOrden,
+      anterior.estado,
+      actualizada.estado,
+      requireUserId(),
+    );
     _updateOrden(idx, actualizada);
     return actualizada;
   }
 
-  OrdenTrabajo actualizarHoras({required String idOrden, required double horas}) {
+  OrdenTrabajo actualizarHoras({
+    required String idOrden,
+    required double horas,
+  }) {
     final idx = ordenes.indexWhere((o) => o.id == idOrden);
     final actualizada = ordenes[idx].copyWith(horasFacturables: horas);
     _updateOrden(idx, actualizada);
@@ -439,9 +504,10 @@ class MockDataStore {
   OrdenTrabajo marcarComoTerminada(String idOrden) {
     final idx = ordenes.indexWhere((o) => o.id == idOrden);
     final orden = ordenes[idx];
-    confirmarSalidaPorOrden(idOrden);
 
-    final reservas = reservasPorOrden[idOrden] ?? [];
+    final reservas = List<ReservaRefaccion>.from(
+      reservasPorOrden[idOrden] ?? [],
+    );
     final costoRefacciones = reservas.fold<double>(
       0,
       (sum, r) => sum + (r.cantidad * r.precioUnitario),
@@ -449,13 +515,174 @@ class MockDataStore {
     final costoManoObra = orden.horasFacturables * tarifaManoObraPorHora;
     final saldo = costoRefacciones + costoManoObra;
 
+    confirmarSalidaPorOrden(idOrden);
+
     final actualizada = orden.copyWith(
       estado: EstadoOrdenTrabajo.terminado,
       saldoPendiente: saldo,
       fechaTerminado: DateTime.now(),
     );
-    _registrarHistorial(idOrden, orden.estado, actualizada.estado, requireUserId());
+    _registrarHistorial(
+      idOrden,
+      orden.estado,
+      actualizada.estado,
+      requireUserId(),
+    );
     _updateOrden(idx, actualizada);
+    return actualizada;
+  }
+
+  /// Exposición de crédito B2B: suma saldo pendiente en OT activas del cliente (§5.4).
+  double calcularExposicionCredito(String idCliente) {
+    final vinsCliente = motocicletas
+        .where((m) => m.idCliente == idCliente)
+        .map((m) => m.vin)
+        .toSet();
+    return ordenes
+        .where(
+          (o) =>
+              vinsCliente.contains(o.idMoto) &&
+              o.estado != EstadoOrdenTrabajo.entregado &&
+              o.estado != EstadoOrdenTrabajo.cancelada &&
+              o.saldoPendiente > 0,
+        )
+        .fold<double>(0, (sum, o) => sum + o.saldoPendiente);
+  }
+
+  /// §5.4 — bloqueo suave flotilla con adeudo > 30 días.
+  bool clienteFlotillaMoroso(String idCliente) {
+    ensureSeeded();
+    final cliente = clientes.firstWhere((c) => c.id == idCliente);
+    if (!cliente.esFlotilla) return false;
+
+    final vinsCliente = motocicletas
+        .where((m) => m.idCliente == idCliente)
+        .map((m) => m.vin)
+        .toSet();
+    final limite = DateTime.now().subtract(const Duration(days: 30));
+
+    return ordenes.any(
+      (o) =>
+          vinsCliente.contains(o.idMoto) &&
+          o.saldoPendiente > 0 &&
+          o.estado != EstadoOrdenTrabajo.cancelada &&
+          o.estado != EstadoOrdenTrabajo.entregado &&
+          o.fechaCreacion.isBefore(limite),
+    );
+  }
+
+  int _contarCitasEnSlot(DateTime fecha) {
+    final slot = DateTime(fecha.year, fecha.month, fecha.day, fecha.hour);
+    return citas.where((c) {
+      if (c.estado != EstadoCita.agendada &&
+          c.estado != EstadoCita.confirmada) {
+        return false;
+      }
+      final cSlot = DateTime(
+        c.fechaCita.year,
+        c.fechaCita.month,
+        c.fechaCita.day,
+        c.fechaCita.hour,
+      );
+      return cSlot == slot;
+    }).length;
+  }
+
+  Cita agendarCita({
+    required String idCliente,
+    required DateTime fechaCita,
+    required String motivo,
+    String? idMoto,
+  }) {
+    ensureSeeded();
+    if (motivo.trim().isEmpty) {
+      throw Exception('El motivo de la cita es obligatorio.');
+    }
+    if (_contarCitasEnSlot(fechaCita) >= maxCitasPorHora) {
+      throw Exception(
+        'Horario saturado: no se permiten más citas en ese slot.',
+      );
+    }
+
+    final cita = Cita(
+      id: _uuid.v4(),
+      idCliente: idCliente,
+      idMoto: idMoto,
+      fechaCita: fechaCita,
+      motivo: motivo.trim(),
+      estado: EstadoCita.agendada,
+      createdAt: DateTime.now(),
+    );
+    citas.insert(0, cita);
+    return cita;
+  }
+
+  Cita confirmarCita(String idCita) {
+    final idx = citas.indexWhere((c) => c.id == idCita);
+    final cita = citas[idx];
+    if (cita.estado != EstadoCita.agendada) {
+      throw Exception('Cita no encontrada o no está agendada.');
+    }
+    final actualizada = Cita(
+      id: cita.id,
+      idCliente: cita.idCliente,
+      idMoto: cita.idMoto,
+      idOrden: cita.idOrden,
+      fechaCita: cita.fechaCita,
+      motivo: cita.motivo,
+      estado: EstadoCita.confirmada,
+      createdAt: cita.createdAt,
+    );
+    citas[idx] = actualizada;
+    return actualizada;
+  }
+
+  Cita cancelarCita(String idCita) {
+    final idx = citas.indexWhere((c) => c.id == idCita);
+    final cita = citas[idx];
+    if (cita.estado != EstadoCita.agendada &&
+        cita.estado != EstadoCita.confirmada) {
+      throw Exception('Cita no encontrada o ya fue completada/cancelada.');
+    }
+    final actualizada = Cita(
+      id: cita.id,
+      idCliente: cita.idCliente,
+      idMoto: cita.idMoto,
+      idOrden: cita.idOrden,
+      fechaCita: cita.fechaCita,
+      motivo: cita.motivo,
+      estado: EstadoCita.cancelada,
+      createdAt: cita.createdAt,
+    );
+    citas[idx] = actualizada;
+    return actualizada;
+  }
+
+  Cita completarCita({
+    required String idCita,
+    required String idMoto,
+    required String idOrden,
+  }) {
+    final idx = citas.indexWhere((c) => c.id == idCita);
+    final cita = citas[idx];
+    if (cita.estado != EstadoCita.agendada &&
+        cita.estado != EstadoCita.confirmada) {
+      throw Exception('Cita no encontrada o no puede completarse.');
+    }
+    if (!ordenes.any((o) => o.id == idOrden)) {
+      throw Exception('La orden de trabajo indicada no existe.');
+    }
+    final actualizada = Cita(
+      id: cita.id,
+      idCliente: cita.idCliente,
+      idMoto: idMoto,
+      idOrden: idOrden,
+      fechaCita: cita.fechaCita,
+      motivo: cita.motivo,
+      estado: EstadoCita.completada,
+      createdAt: cita.createdAt,
+    );
+    citas[idx] = actualizada;
     return actualizada;
   }
 
@@ -463,7 +690,12 @@ class MockDataStore {
     final idx = ordenes.indexWhere((o) => o.id == idOrden);
     final anterior = ordenes[idx];
     final actualizada = anterior.copyWith(estado: EstadoOrdenTrabajo.entregado);
-    _registrarHistorial(idOrden, anterior.estado, actualizada.estado, requireUserId());
+    _registrarHistorial(
+      idOrden,
+      anterior.estado,
+      actualizada.estado,
+      requireUserId(),
+    );
     _updateOrden(idx, actualizada);
     return actualizada;
   }
@@ -489,12 +721,20 @@ class MockDataStore {
     }
 
     final actualizada = orden.copyWith(estado: EstadoOrdenTrabajo.cancelada);
-    _registrarHistorial(idOrden, orden.estado, actualizada.estado, requireUserId());
+    _registrarHistorial(
+      idOrden,
+      orden.estado,
+      actualizada.estado,
+      requireUserId(),
+    );
     _updateOrden(idx, actualizada);
     return actualizada;
   }
 
-  OrdenTrabajo cambiarEstado({required String idOrden, required EstadoOrdenTrabajo nuevoEstado}) {
+  OrdenTrabajo cambiarEstado({
+    required String idOrden,
+    required EstadoOrdenTrabajo nuevoEstado,
+  }) {
     final idx = ordenes.indexWhere((o) => o.id == idOrden);
     final orden = ordenes[idx];
     if (orden.esInmutable) {
@@ -506,6 +746,248 @@ class MockDataStore {
     return actualizada;
   }
 
+  OrdenTrabajo aprobarPresupuesto(String idOrden) {
+    final idx = ordenes.indexWhere((o) => o.id == idOrden);
+    final orden = ordenes[idx];
+    if (orden.esInmutable) {
+      throw Exception('La orden ya no admite cambios.');
+    }
+    final actualizada = orden.copyWith(
+      fechaAprobacionPresupuesto: DateTime.now(),
+      estado: EstadoOrdenTrabajo.enProceso,
+    );
+    _registrarHistorial(
+      idOrden,
+      orden.estado,
+      actualizada.estado,
+      requireUserId(),
+    );
+    _updateOrden(idx, actualizada);
+    return actualizada;
+  }
+
+  OrdenTrabajo reabrirOrden(String idOrden) {
+    final user = requireUserId();
+    if (currentUser?.rol != RolEmpleado.admin) {
+      throw Exception('Solo un administrador puede reabrir la orden.');
+    }
+    final idx = ordenes.indexWhere((o) => o.id == idOrden);
+    final orden = ordenes[idx];
+    if (orden.estado != EstadoOrdenTrabajo.terminado) {
+      throw Exception('Solo se puede reabrir una orden en estado terminado.');
+    }
+    final actualizada = orden.copyWith(
+      estado: EstadoOrdenTrabajo.enProceso,
+      fechaTerminado: null,
+    );
+    _registrarHistorial(idOrden, orden.estado, actualizada.estado, user);
+    _updateOrden(idx, actualizada);
+    return actualizada;
+  }
+
+  ExtensionCotizacion solicitarExtensionCotizacion({
+    required String idOrden,
+    required String descripcion,
+    required double montoAdicional,
+  }) {
+    final orden = ordenes.firstWhere((o) => o.id == idOrden);
+    if (!orden.presupuestoAprobado || orden.esInmutable) {
+      throw Exception(
+        'La orden debe tener presupuesto aprobado y estar activa.',
+      );
+    }
+    if (montoAdicional <= 0)
+      throw Exception('El monto adicional debe ser mayor a cero.');
+    final ext = ExtensionCotizacion(
+      id: _uuid.v4(),
+      idOrden: idOrden,
+      descripcion: descripcion,
+      montoAdicional: montoAdicional,
+      estado: EstadoExtensionCotizacion.pendiente,
+      fechaSolicitud: DateTime.now(),
+    );
+    extensionesCotizacion.insert(0, ext);
+    return ext;
+  }
+
+  ExtensionCotizacion aprobarExtensionCotizacion(String idExtension) {
+    if (currentUser?.rol != RolEmpleado.admin &&
+        currentUser?.rol != RolEmpleado.supervisor) {
+      throw Exception('Sin permisos para aprobar extensiones.');
+    }
+    final idx = extensionesCotizacion.indexWhere((e) => e.id == idExtension);
+    final ext = extensionesCotizacion[idx];
+    if (ext.estado != EstadoExtensionCotizacion.pendiente) {
+      throw Exception('La extensión ya fue procesada.');
+    }
+    final actualizada = ext.copyWith(
+      estado: EstadoExtensionCotizacion.aprobada,
+    );
+    extensionesCotizacion[idx] = actualizada;
+    return actualizada;
+  }
+
+  OrdenCompra crearOrdenCompra({
+    required String idProveedor,
+    required List<CompraDetalle> items,
+  }) {
+    if (currentUser?.rol != RolEmpleado.admin &&
+        currentUser?.rol != RolEmpleado.supervisor) {
+      throw Exception('Sin permisos para crear órdenes de compra.');
+    }
+    final id = _uuid.v4();
+    final oc = OrdenCompra(
+      id: id,
+      idProveedor: idProveedor,
+      fechaCreacion: DateTime.now(),
+      estado: EstadoOrdenCompra.borrador,
+      total: items.fold<double>(0, (s, i) => s + i.cantidad * i.precioCompra),
+    );
+    ordenesCompra.insert(0, oc);
+    for (final item in items) {
+      compraDetalle.add(
+        CompraDetalle(
+          idCompra: id,
+          skuRefaccion: item.skuRefaccion,
+          cantidad: item.cantidad,
+          precioCompra: item.precioCompra,
+        ),
+      );
+    }
+    return oc;
+  }
+
+  OrdenCompra aprobarOrdenCompra(String idCompra) {
+    if (currentUser?.rol != RolEmpleado.admin &&
+        currentUser?.rol != RolEmpleado.supervisor) {
+      throw Exception('Sin permisos para aprobar órdenes de compra.');
+    }
+    final idx = ordenesCompra.indexWhere((o) => o.id == idCompra);
+    final oc = ordenesCompra[idx];
+    if (oc.estado != EstadoOrdenCompra.borrador) {
+      throw Exception('La orden de compra no está en borrador.');
+    }
+    final actualizada = OrdenCompra(
+      id: oc.id,
+      idProveedor: oc.idProveedor,
+      fechaCreacion: oc.fechaCreacion,
+      estado: EstadoOrdenCompra.aprobada,
+      total: oc.total,
+    );
+    ordenesCompra[idx] = actualizada;
+    return actualizada;
+  }
+
+  void recibirOrdenCompra(String idCompra) {
+    if (currentUser?.rol != RolEmpleado.admin &&
+        currentUser?.rol != RolEmpleado.supervisor) {
+      throw Exception('Sin permisos para recibir órdenes de compra.');
+    }
+    final idx = ordenesCompra.indexWhere((o) => o.id == idCompra);
+    final oc = ordenesCompra[idx];
+    if (oc.estado != EstadoOrdenCompra.aprobada) {
+      throw Exception('La orden de compra debe estar aprobada.');
+    }
+    final items = compraDetalle.where((d) => d.idCompra == idCompra);
+    for (final item in items) {
+      registrarEntrada(
+        sku: item.skuRefaccion,
+        cantidad: item.cantidad,
+        costoUnitario: item.precioCompra,
+        idProveedor: oc.idProveedor,
+      );
+    }
+    ordenesCompra[idx] = OrdenCompra(
+      id: oc.id,
+      idProveedor: oc.idProveedor,
+      fechaCreacion: oc.fechaCreacion,
+      estado: EstadoOrdenCompra.recibida,
+      total: oc.total,
+    );
+  }
+
+  GastoOperativo registrarGastoOperativo({
+    required String concepto,
+    required double monto,
+    String? categoria,
+  }) {
+    if (currentUser?.rol != RolEmpleado.admin &&
+        currentUser?.rol != RolEmpleado.supervisor) {
+      throw Exception('Sin permisos para registrar gastos operativos.');
+    }
+    if (monto <= 0) throw Exception('Monto inválido.');
+    final gasto = GastoOperativo(
+      id: _uuid.v4(),
+      concepto: concepto,
+      categoria: categoria,
+      monto: monto,
+      fechaGasto: DateTime.now(),
+    );
+    gastosOperativos.insert(0, gasto);
+    return gasto;
+  }
+
+  double obtenerGastosOperativosMes() {
+    final now = DateTime.now();
+    return gastosOperativos
+        .where(
+          (g) =>
+              g.fechaGasto.month == now.month && g.fechaGasto.year == now.year,
+        )
+        .fold(0.0, (s, g) => s + g.monto);
+  }
+
+  List<Map<String, dynamic>> obtenerReservasPorOrden(String idOrden) {
+    final reservas = reservasPorOrden[idOrden] ?? const <ReservaRefaccion>[];
+    return reservas.map((r) {
+      final ref = refacciones.firstWhere(
+        (item) => item.sku == r.sku,
+        orElse: () => Refaccion(
+          sku: r.sku,
+          nombre: r.sku,
+          precioCosto: 0,
+          precioVenta: r.precioUnitario,
+          stockActual: 0,
+          stockReservado: 0,
+          stockMinimo: 0,
+        ),
+      );
+      return {
+        'sku': r.sku,
+        'nombre': ref.nombre,
+        'cantidad': r.cantidad,
+        'precio_unitario': r.precioUnitario,
+        'subtotal': r.cantidad * r.precioUnitario,
+      };
+    }).toList();
+  }
+
+  List<Map<String, dynamic>> obtenerConsumosPorOrden(String idOrden) {
+    final consumos = consumosPorOrden[idOrden] ?? const <ConsumoRefaccion>[];
+    return consumos.map((c) {
+      final ref = refacciones.firstWhere(
+        (item) => item.sku == c.sku,
+        orElse: () => Refaccion(
+          sku: c.sku,
+          nombre: c.nombre,
+          precioCosto: 0,
+          precioVenta: c.precioUnitario,
+          stockActual: 0,
+          stockReservado: 0,
+          stockMinimo: 0,
+        ),
+      );
+      return {
+        'sku': c.sku,
+        'nombre': ref.nombre,
+        'cantidad': c.cantidad,
+        'precio_unitario': c.precioUnitario,
+        'subtotal': c.cantidad * c.precioUnitario,
+        'tipo': c.tipo,
+      };
+    }).toList();
+  }
+
   void reservarParaOrden({
     required String idOrden,
     required String sku,
@@ -513,18 +995,87 @@ class MockDataStore {
     required double precioUnitarioVenta,
   }) {
     if (cantidad <= 0) throw Exception('Cantidad inválida.');
+    final orden = ordenes.firstWhere((o) => o.id == idOrden);
+    if (!orden.presupuestoAprobado) {
+      throw Exception(
+        'Debe aprobar el presupuesto antes de reservar refacciones.',
+      );
+    }
+    final reservas = reservasPorOrden[idOrden] ?? [];
+    if (reservas.isNotEmpty) {
+      final extension = extensionesCotizacion.where(
+        (e) =>
+            e.idOrden == idOrden &&
+            e.estado == EstadoExtensionCotizacion.aprobada &&
+            !e.utilizada,
+      );
+      if (extension.isEmpty) {
+        throw Exception(
+          'Se requiere una extensión de cotización aprobada para agregar refacciones.',
+        );
+      }
+      final idxExt = extensionesCotizacion.indexWhere(
+        (e) => e.id == extension.first.id,
+      );
+      extensionesCotizacion[idxExt] = extension.first.copyWith(utilizada: true);
+    }
     final rIdx = refacciones.indexWhere((r) => r.sku == sku);
     final ref = refacciones[rIdx];
     if (ref.stockDisponible < cantidad) {
       throw Exception('Stock insuficiente para $sku.');
     }
-    refacciones[rIdx] = ref.copyWith(stockReservado: ref.stockReservado + cantidad);
+    refacciones[rIdx] = ref.copyWith(
+      stockReservado: ref.stockReservado + cantidad,
+    );
     reservasPorOrden.putIfAbsent(idOrden, () => []);
-    reservasPorOrden[idOrden]!.add(ReservaRefaccion(
+    reservasPorOrden[idOrden]!.add(
+      ReservaRefaccion(
+        sku: sku,
+        cantidad: cantidad,
+        precioUnitario: precioUnitarioVenta,
+      ),
+    );
+  }
+
+  void registrarConsumoParaOrden({
+    required String idOrden,
+    required String sku,
+    required String nombre,
+    required int cantidad,
+    required double precioUnitario,
+  }) {
+    if (cantidad <= 0) throw Exception('Cantidad inválida.');
+    _findOrden(idOrden);
+
+    final rIdx = refacciones.indexWhere((r) => r.sku == sku);
+    if (rIdx < 0) throw Exception('Refacción no encontrada.');
+
+    final ref = refacciones[rIdx];
+    if (ref.stockActual < cantidad) {
+      throw Exception('Stock insuficiente para $sku.');
+    }
+
+    refacciones[rIdx] = ref.copyWith(stockActual: ref.stockActual - cantidad);
+    consumosPorOrden.putIfAbsent(idOrden, () => []);
+    consumosPorOrden[idOrden]!.add(
+      ConsumoRefaccion(
+        sku: sku,
+        nombre: nombre,
+        cantidad: cantidad,
+        precioUnitario: precioUnitario,
+        tipo: 'consumo_real',
+      ),
+    );
+
+    _registrarMovimientoKardex(
       sku: sku,
-      cantidad: cantidad,
-      precioUnitario: precioUnitarioVenta,
-    ));
+      tipo: TipoMovimientoInventario.salidaOt,
+      cantidad: -cantidad,
+      costoUnitario: ref.precioCosto,
+      referenciaTipo: 'consumo_ot',
+      referenciaId: idOrden,
+      idUsuario: currentUser?.id,
+    );
   }
 
   void confirmarSalidaPorOrden(String idOrden) {
@@ -533,11 +1084,45 @@ class MockDataStore {
       final rIdx = refacciones.indexWhere((x) => x.sku == r.sku);
       if (rIdx < 0) continue;
       final ref = refacciones[rIdx];
+      _registrarMovimientoKardex(
+        sku: r.sku,
+        tipo: TipoMovimientoInventario.salidaOt,
+        cantidad: -r.cantidad,
+        costoUnitario: ref.precioCosto,
+        referenciaTipo: 'salida_ot',
+        referenciaId: idOrden,
+        idUsuario: currentUser?.id,
+      );
       refacciones[rIdx] = ref.copyWith(
         stockActual: ref.stockActual - r.cantidad,
         stockReservado: ref.stockReservado - r.cantidad,
       );
     }
+  }
+
+  void _registrarMovimientoKardex({
+    required String sku,
+    required TipoMovimientoInventario tipo,
+    required int cantidad,
+    double? costoUnitario,
+    required String referenciaTipo,
+    required String referenciaId,
+    String? idUsuario,
+  }) {
+    movimientosInventario.insert(
+      0,
+      MovimientoInventario(
+        id: _uuid.v4(),
+        sku: sku,
+        tipo: tipo,
+        cantidad: cantidad,
+        costoUnitario: costoUnitario,
+        referenciaTipo: referenciaTipo,
+        referenciaId: referenciaId,
+        idUsuario: idUsuario,
+        createdAt: DateTime.now(),
+      ),
+    );
   }
 
   void ajustarInventarioManual({
@@ -550,13 +1135,25 @@ class MockDataStore {
     final nuevoStock = ref.stockActual + cantidadAjuste;
     if (nuevoStock < 0) throw Exception('El ajuste dejaría stock negativo.');
     refacciones[rIdx] = ref.copyWith(stockActual: nuevoStock);
-    ajustesInventario.add(AjusteInventario(
+    final ajusteId = _uuid.v4();
+    ajustesInventario.add(
+      AjusteInventario(
+        id: ajusteId,
+        sku: sku,
+        cantidad: cantidadAjuste,
+        justificacion: justificacion,
+        fecha: DateTime.now(),
+        idUsuario: requireUserId(),
+      ),
+    );
+    _registrarMovimientoKardex(
       sku: sku,
+      tipo: TipoMovimientoInventario.ajuste,
       cantidad: cantidadAjuste,
-      justificacion: justificacion,
-      fecha: DateTime.now(),
+      referenciaTipo: 'ajuste_inventario',
+      referenciaId: ajusteId,
       idUsuario: requireUserId(),
-    ));
+    );
   }
 
   void registrarPago({
@@ -568,21 +1165,22 @@ class MockDataStore {
     final orden = ordenes[idx];
     if (monto <= 0) throw Exception('Monto inválido.');
 
-    final pagosActivos = pagos.where((p) => p.idOrden == idOrden && !p.esReversion).fold<double>(
-          0,
-          (s, p) => s + p.monto,
-        );
+    final pagosActivos = pagos
+        .where((p) => p.idOrden == idOrden && !p.esReversion)
+        .fold<double>(0, (s, p) => s + p.monto);
     if (pagosActivos + monto > orden.saldoPendiente + 0.01) {
       throw Exception('El pago excede el saldo pendiente.');
     }
 
-    pagos.add(Pago(
-      id: _uuid.v4(),
-      idOrden: idOrden,
-      monto: monto,
-      metodoPago: metodoPago,
-      fechaPago: DateTime.now(),
-    ));
+    pagos.add(
+      Pago(
+        id: _uuid.v4(),
+        idOrden: idOrden,
+        monto: monto,
+        metodoPago: metodoPago,
+        fechaPago: DateTime.now(),
+      ),
+    );
 
     final nuevoSaldo = orden.saldoPendiente - monto;
     var nuevoEstado = orden.estado;
@@ -590,15 +1188,16 @@ class MockDataStore {
       nuevoEstado = EstadoOrdenTrabajo.pagado;
       _registrarHistorial(idOrden, orden.estado, nuevoEstado, requireUserId());
 
-      // Generar comisión
+      // Comisión solo sobre mano de obra (§5.5)
       if (orden.idMecanico != null) {
+        final manoObra = orden.horasFacturables * tarifaManoObraPorHora;
         comisiones.insert(
           0,
           Comision(
             id: _uuid.v4(),
             idOrden: idOrden,
             idMecanico: orden.idMecanico!,
-            monto: orden.saldoPendiente * porcentajeComision,
+            monto: manoObra * porcentajeComision,
             porcentajeAplicado: porcentajeComision,
             fechaGenerada: DateTime.now(),
           ),
@@ -606,29 +1205,51 @@ class MockDataStore {
       }
     }
 
-    _updateOrden(idx, orden.copyWith(saldoPendiente: nuevoSaldo.clamp(0, double.infinity), estado: nuevoEstado));
+    _updateOrden(
+      idx,
+      orden.copyWith(
+        saldoPendiente: nuevoSaldo.clamp(0, double.infinity),
+        estado: nuevoEstado,
+      ),
+    );
   }
 
   void revertirPago(String idPago) {
     final pago = pagos.firstWhere((p) => p.id == idPago);
-    pagos.add(Pago(
-      id: _uuid.v4(),
-      idOrden: pago.idOrden,
-      monto: -pago.monto,
-      metodoPago: pago.metodoPago,
-      idPagoRevertido: idPago,
-      fechaPago: DateTime.now(),
-    ));
+    if (pago.esReversion || pago.monto <= 0) {
+      throw Exception('No se puede revertir este pago.');
+    }
+    pagos.add(
+      Pago(
+        id: _uuid.v4(),
+        idOrden: pago.idOrden,
+        monto: -pago.monto,
+        metodoPago: pago.metodoPago,
+        idPagoRevertido: idPago,
+        fechaPago: DateTime.now(),
+      ),
+    );
 
     final idx = ordenes.indexWhere((o) => o.id == pago.idOrden);
     final orden = ordenes[idx];
+    var nuevoEstado = orden.estado;
+    if (orden.estado == EstadoOrdenTrabajo.pagado) {
+      nuevoEstado = EstadoOrdenTrabajo.terminado;
+      comisiones.removeWhere((c) => c.idOrden == pago.idOrden);
+    }
     _updateOrden(
       idx,
-      orden.copyWith(saldoPendiente: orden.saldoPendiente + pago.monto),
+      orden.copyWith(
+        saldoPendiente: orden.saldoPendiente + pago.monto,
+        estado: nuevoEstado,
+      ),
     );
   }
 
-  Factura emitirFactura({required String idOrden, required String rfcReceptor}) {
+  Factura emitirFactura({
+    required String idOrden,
+    required String rfcReceptor,
+  }) {
     final factura = Factura(
       id: _uuid.v4(),
       idOrden: idOrden,
@@ -661,11 +1282,13 @@ class MockDataStore {
   double obtenerIngresosMensuales() {
     final now = DateTime.now();
     return pagos
-        .where((p) =>
-            !p.esReversion &&
-            p.monto > 0 &&
-            p.fechaPago.month == now.month &&
-            p.fechaPago.year == now.year)
+        .where(
+          (p) =>
+              !p.esReversion &&
+              p.monto > 0 &&
+              p.fechaPago.month == now.month &&
+              p.fechaPago.year == now.year,
+        )
         .fold(0.0, (s, p) => s + p.monto);
   }
 
@@ -680,16 +1303,25 @@ class MockDataStore {
     required String idProveedor,
   }) {
     incrementarStock(sku, cantidad);
+    final entradaId = _uuid.v4();
     entradasInventario.insert(
       0,
       EntradaInventario(
-        id: _uuid.v4(),
+        id: entradaId,
         sku: sku,
         cantidad: cantidad,
         costoUnitario: costoUnitario,
         idProveedor: idProveedor,
         fecha: DateTime.now(),
       ),
+    );
+    _registrarMovimientoKardex(
+      sku: sku,
+      tipo: TipoMovimientoInventario.entradaCompra,
+      cantidad: cantidad,
+      costoUnitario: costoUnitario,
+      referenciaTipo: 'entrada_inventario',
+      referenciaId: entradaId,
     );
   }
 
@@ -699,26 +1331,142 @@ class MockDataStore {
     refacciones[rIdx] = ref.copyWith(stockActual: ref.stockActual + cantidad);
   }
 
-  String registrarVentaPos(List<Map<String, dynamic>> items, {String metodoPago = 'efectivo'}) {
+  String registrarVentaPos(
+    List<Map<String, dynamic>> items, {
+    String metodoPago = 'efectivo',
+  }) {
+    final id = _uuid.v4();
     for (final item in items) {
       final sku = item['sku'] as String;
       final cantidad = item['cantidad'] as int;
+      final precioUnitario = (item['precio_unitario'] as num).toDouble();
       final rIdx = refacciones.indexWhere((r) => r.sku == sku);
       final ref = refacciones[rIdx];
       if (ref.stockDisponible < cantidad) {
         throw Exception('Stock insuficiente para $sku.');
       }
+      if (precioUnitario < ref.precioCosto) {
+        throw Exception(
+          'El precio de venta (\$${precioUnitario.toStringAsFixed(2)}) '
+          'no puede ser menor al costo (\$${ref.precioCosto.toStringAsFixed(2)}) para $sku.',
+        );
+      }
       refacciones[rIdx] = ref.copyWith(stockActual: ref.stockActual - cantidad);
+      final itemId = _uuid.v4();
+      _registrarMovimientoKardex(
+        sku: sku,
+        tipo: TipoMovimientoInventario.salidaVentaPos,
+        cantidad: -cantidad,
+        costoUnitario: ref.precioCosto,
+        referenciaTipo: 'venta_pos_item',
+        referenciaId: itemId,
+        idUsuario: requireUserId(),
+      );
     }
-    final id = _uuid.v4();
-    ventasPos.insert(0, VentaPos(
-      id: id,
-      items: items,
-      fecha: DateTime.now(),
-      idUsuario: requireUserId(),
-      metodoPago: metodoPago,
-    ));
+    ventasPos.insert(
+      0,
+      VentaPos(
+        id: id,
+        items: items,
+        fecha: DateTime.now(),
+        idUsuario: requireUserId(),
+        metodoPago: metodoPago,
+      ),
+    );
     return id;
+  }
+
+  double calcularEfectivoEsperadoTurno({String? idUsuario}) {
+    ensureSeeded();
+    final hoy = DateTime.now();
+    return ventasPos
+        .where((v) {
+          if (v.devuelta || v.metodoPago != 'efectivo') return false;
+          if (idUsuario != null && v.idUsuario != idUsuario) return false;
+          return v.fecha.year == hoy.year &&
+              v.fecha.month == hoy.month &&
+              v.fecha.day == hoy.day;
+        })
+        .fold<double>(0, (sum, v) => sum + v.total);
+  }
+
+  CierreCajaRecord registrarCierreCajaCiego({required double efectivoContado}) {
+    if (efectivoContado < 0) {
+      throw Exception('El efectivo contado debe ser un monto válido.');
+    }
+    final userId = requireUserId();
+    final esperado = calcularEfectivoEsperadoTurno(idUsuario: userId);
+    final cierre = CierreCajaRecord(
+      id: _uuid.v4(),
+      idUsuario: userId,
+      efectivoContado: efectivoContado,
+      efectivoEsperado: esperado,
+      diferencia: efectivoContado - esperado,
+      fecha: DateTime.now(),
+    );
+    cierresCaja.insert(0, cierre);
+    return cierre;
+  }
+
+  void devolverVentaPos(String idVenta) {
+    ensureSeeded();
+    final idx = ventasPos.indexWhere((v) => v.id == idVenta);
+    final venta = ventasPos[idx];
+    if (venta.devuelta) {
+      throw Exception('Esta venta ya fue devuelta.');
+    }
+    for (final item in venta.items) {
+      final sku = item['sku'] as String;
+      final cantidad = item['cantidad'] as int;
+      final rIdx = refacciones.indexWhere((r) => r.sku == sku);
+      final ref = refacciones[rIdx];
+      refacciones[rIdx] = ref.copyWith(stockActual: ref.stockActual + cantidad);
+      _registrarMovimientoKardex(
+        sku: sku,
+        tipo: TipoMovimientoInventario.ajuste,
+        cantidad: cantidad,
+        costoUnitario: ref.precioCosto,
+        referenciaTipo: 'devolucion_pos',
+        referenciaId: idVenta,
+        idUsuario: requireUserId(),
+      );
+    }
+    ventasPos[idx] = VentaPos(
+      id: venta.id,
+      items: venta.items,
+      fecha: venta.fecha,
+      idUsuario: venta.idUsuario,
+      metodoPago: venta.metodoPago,
+      devuelta: true,
+    );
+  }
+
+  List<Map<String, dynamic>> listOrdenesCompra() {
+    ensureSeeded();
+    return ordenesCompra
+        .map(
+          (oc) => {
+            'id': oc.id,
+            'id_proveedor': oc.idProveedor,
+            'fecha_creacion': oc.fechaCreacion.toIso8601String(),
+            'estado': oc.estado.name,
+            'total': oc.total,
+          },
+        )
+        .toList();
+  }
+
+  List<Map<String, dynamic>> detalleOrdenCompra(String idCompra) {
+    return compraDetalle
+        .where((d) => d.idCompra == idCompra)
+        .map(
+          (d) => {
+            'sku': d.skuRefaccion,
+            'cantidad': d.cantidad,
+            'precio_compra': d.precioCompra,
+          },
+        )
+        .toList();
   }
 
   String subirEvidencia({
@@ -728,15 +1476,18 @@ class MockDataStore {
     required String etapa,
     required String subidaPor,
   }) {
-    final path = '$idOrden/${DateTime.now().millisecondsSinceEpoch}_$nombreArchivo';
-    evidencias.add(EvidenciaOt(
-      id: _uuid.v4(),
-      idOrden: idOrden,
-      storagePath: path,
-      etapa: etapa,
-      subidaPor: subidaPor,
-      bytes: bytes,
-    ));
+    final path =
+        '$idOrden/${DateTime.now().millisecondsSinceEpoch}_$nombreArchivo';
+    evidencias.add(
+      EvidenciaOt(
+        id: _uuid.v4(),
+        idOrden: idOrden,
+        storagePath: path,
+        etapa: etapa,
+        subidaPor: subidaPor,
+        bytes: bytes,
+      ),
+    );
     return path;
   }
 }
@@ -768,6 +1519,22 @@ class ReservaRefaccion {
     required this.sku,
     required this.cantidad,
     required this.precioUnitario,
+  });
+}
+
+class ConsumoRefaccion {
+  final String sku;
+  final String nombre;
+  final int cantidad;
+  final double precioUnitario;
+  final String tipo;
+
+  ConsumoRefaccion({
+    required this.sku,
+    required this.nombre,
+    required this.cantidad,
+    required this.precioUnitario,
+    required this.tipo,
   });
 }
 
@@ -813,6 +1580,7 @@ class VentaPos {
   final DateTime fecha;
   final String idUsuario;
   final String metodoPago;
+  final bool devuelta;
 
   VentaPos({
     required this.id,
@@ -820,10 +1588,37 @@ class VentaPos {
     required this.fecha,
     required this.idUsuario,
     this.metodoPago = 'efectivo',
+    this.devuelta = false,
+  });
+
+  double get total => items.fold<double>(
+    0,
+    (sum, i) =>
+        sum +
+        (i['cantidad'] as int) * ((i['precio_unitario'] as num).toDouble()),
+  );
+}
+
+class CierreCajaRecord {
+  final String id;
+  final String idUsuario;
+  final double efectivoContado;
+  final double efectivoEsperado;
+  final double diferencia;
+  final DateTime fecha;
+
+  CierreCajaRecord({
+    required this.id,
+    required this.idUsuario,
+    required this.efectivoContado,
+    required this.efectivoEsperado,
+    required this.diferencia,
+    required this.fecha,
   });
 }
 
 class AjusteInventario {
+  final String id;
   final String sku;
   final int cantidad;
   final String justificacion;
@@ -831,6 +1626,7 @@ class AjusteInventario {
   final String idUsuario;
 
   AjusteInventario({
+    required this.id,
     required this.sku,
     required this.cantidad,
     required this.justificacion,
@@ -858,7 +1654,8 @@ class EmpleadoInvitacionRecord {
     this.activado = false,
   });
 
-  EmpleadoInvitacionRecord copyWith({bool? activado}) => EmpleadoInvitacionRecord(
+  EmpleadoInvitacionRecord copyWith({bool? activado}) =>
+      EmpleadoInvitacionRecord(
         id: id,
         email: email,
         nombre: nombre,

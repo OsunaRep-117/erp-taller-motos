@@ -6,7 +6,7 @@ part 'pago.g.dart';
 enum MetodoPago { efectivo, tarjeta, transferencia, creditoB2B }
 
 @freezed
-class Pago with _$Pago {
+abstract class Pago with _$Pago {
   const Pago._();
 
   const factory Pago({

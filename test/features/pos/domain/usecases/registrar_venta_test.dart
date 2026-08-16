@@ -24,15 +24,25 @@ void main() {
       verifyNever(() => repository.registrarVenta(any()));
     });
 
-    test('delega al repositorio cuando hay items (validación de margen la hace el servidor)', () async {
-      const items = [
-        ItemCarrito(sku: 'BUJIA-01', nombre: 'Bujía', cantidad: 2, precioUnitario: 90),
-      ];
-      when(() => repository.registrarVenta(items)).thenAnswer((_) async => const Right('venta-1'));
+    test(
+      'delega al repositorio cuando hay items (validación de margen la hace el servidor)',
+      () async {
+        const items = [
+          ItemCarrito(
+            sku: 'BUJIA-01',
+            nombre: 'Bujía',
+            cantidad: 2,
+            precioUnitario: 90,
+          ),
+        ];
+        when(
+          () => repository.registrarVenta(items),
+        ).thenAnswer((_) async => const Right('venta-1'));
 
-      final resultado = await useCase(items);
+        final resultado = await useCase(items);
 
-      expect(resultado, const Right('venta-1'));
-    });
+        expect(resultado, const Right('venta-1'));
+      },
+    );
   });
 }

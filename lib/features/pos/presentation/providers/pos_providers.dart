@@ -9,6 +9,8 @@ import '../../data/datasources/pos_remote_datasource.dart';
 import '../../data/repositories/pos_repository_impl.dart';
 import '../../domain/repositories/pos_repository.dart';
 import '../../domain/usecases/registrar_venta.dart';
+import '../../domain/usecases/cierre_caja_ciego.dart';
+import '../../domain/usecases/devolver_venta_pos.dart';
 
 part 'pos_providers.g.dart';
 
@@ -31,11 +33,23 @@ RegistrarVenta registrarVentaUseCase(RegistrarVentaUseCaseRef ref) {
 }
 
 @riverpod
+CierreCajaCiego cierreCajaCiegoUseCase(CierreCajaCiegoUseCaseRef ref) {
+  return CierreCajaCiego(ref.watch(posRepositoryProvider));
+}
+
+@riverpod
+DevolverVentaPos devolverVentaPosUseCase(DevolverVentaPosUseCaseRef ref) {
+  return DevolverVentaPos(ref.watch(posRepositoryProvider));
+}
+
+@riverpod
 Future<List<Map<String, dynamic>>> refaccionesPos(RefaccionesPosRef ref) {
   return ref.watch(posDataSourceProvider).listarRefaccionesPos();
 }
 
 @riverpod
-Future<List<Map<String, dynamic>>> ventasPosHistorial(VentasPosHistorialRef ref) {
+Future<List<Map<String, dynamic>>> ventasPosHistorial(
+  VentasPosHistorialRef ref,
+) {
   return ref.watch(posDataSourceProvider).listarVentas();
 }

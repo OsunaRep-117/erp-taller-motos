@@ -10,15 +10,19 @@ class CrearMotocicletaScreen extends ConsumerStatefulWidget {
   const CrearMotocicletaScreen({super.key});
 
   @override
-  ConsumerState<CrearMotocicletaScreen> createState() => _CrearMotocicletaScreenState();
+  ConsumerState<CrearMotocicletaScreen> createState() =>
+      _CrearMotocicletaScreenState();
 }
 
-class _CrearMotocicletaScreenState extends ConsumerState<CrearMotocicletaScreen> {
+class _CrearMotocicletaScreenState
+    extends ConsumerState<CrearMotocicletaScreen> {
   final _vinController = TextEditingController();
   final _placaController = TextEditingController();
   final _marcaController = TextEditingController();
   final _modeloController = TextEditingController();
-  final _anioController = TextEditingController(text: DateTime.now().year.toString());
+  final _anioController = TextEditingController(
+    text: DateTime.now().year.toString(),
+  );
   String? _idClienteSeleccionado;
   bool _guardando = false;
   String? _error;
@@ -81,66 +85,82 @@ class _CrearMotocicletaScreenState extends ConsumerState<CrearMotocicletaScreen>
             title: 'Registro de motocicleta',
             maxWidth: 480,
             child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              clientesAsync.when(
-                data: (clientes) {
-                  if (clientes.isEmpty) {
-                    return const Text('No hay clientes registrados. Crea uno primero.');
-                  }
-                  return DropdownButtonFormField<String>(
-                    value: _idClienteSeleccionado,
-                    decoration: const InputDecoration(labelText: 'Propietario'),
-                    items: clientes
-                        .map((c) => DropdownMenuItem(value: c.id, child: Text(c.nombreCompleto)))
-                        .toList(),
-                    onChanged: (v) => setState(() => _idClienteSeleccionado = v),
-                  );
-                },
-                loading: () => const LinearProgressIndicator(),
-                error: (e, _) => Text('Error: $e'),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _vinController,
-                decoration: const InputDecoration(labelText: 'VIN (17 caracteres)'),
-                textCapitalization: TextCapitalization.characters,
-                maxLength: 17,
-              ),
-              TextField(
-                controller: _placaController,
-                decoration: const InputDecoration(labelText: 'Placa'),
-                textCapitalization: TextCapitalization.characters,
-              ),
-              TextField(
-                controller: _marcaController,
-                decoration: const InputDecoration(labelText: 'Marca'),
-              ),
-              TextField(
-                controller: _modeloController,
-                decoration: const InputDecoration(labelText: 'Modelo'),
-              ),
-              TextField(
-                controller: _anioController,
-                decoration: const InputDecoration(labelText: 'Año'),
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: 12),
-              if (_error != null) ...[
-                Text(_error!, style: const TextStyle(color: Colors.red)),
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                clientesAsync.when(
+                  data: (clientes) {
+                    if (clientes.isEmpty) {
+                      return const Text(
+                        'No hay clientes registrados. Crea uno primero.',
+                      );
+                    }
+                    return DropdownButtonFormField<String>(
+                      value: _idClienteSeleccionado,
+                      decoration: const InputDecoration(
+                        labelText: 'Propietario',
+                      ),
+                      items: clientes
+                          .map(
+                            (c) => DropdownMenuItem(
+                              value: c.id,
+                              child: Text(c.nombreCompleto),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (v) =>
+                          setState(() => _idClienteSeleccionado = v),
+                    );
+                  },
+                  loading: () => const LinearProgressIndicator(),
+                  error: (e, _) => Text('Error: $e'),
+                ),
                 const SizedBox(height: 12),
+                TextField(
+                  controller: _vinController,
+                  decoration: const InputDecoration(
+                    labelText: 'VIN (17 caracteres)',
+                  ),
+                  textCapitalization: TextCapitalization.characters,
+                  maxLength: 17,
+                ),
+                TextField(
+                  controller: _placaController,
+                  decoration: const InputDecoration(labelText: 'Placa'),
+                  textCapitalization: TextCapitalization.characters,
+                ),
+                TextField(
+                  controller: _marcaController,
+                  decoration: const InputDecoration(labelText: 'Marca'),
+                ),
+                TextField(
+                  controller: _modeloController,
+                  decoration: const InputDecoration(labelText: 'Modelo'),
+                ),
+                TextField(
+                  controller: _anioController,
+                  decoration: const InputDecoration(labelText: 'Año'),
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 12),
+                if (_error != null) ...[
+                  Text(_error!, style: const TextStyle(color: Colors.red)),
+                  const SizedBox(height: 12),
+                ],
+                FilledButton(
+                  onPressed: _guardando ? null : _guardar,
+                  child: _guardando
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Guardar motocicleta'),
+                ),
               ],
-              FilledButton(
-                onPressed: _guardando ? null : _guardar,
-                child: _guardando
-                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                    : const Text('Guardar motocicleta'),
-              ),
-            ],
+            ),
           ),
         ),
       ),
-    ),
     );
   }
 }

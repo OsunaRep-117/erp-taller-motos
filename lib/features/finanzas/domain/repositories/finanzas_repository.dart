@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 
 import '../../../../core/errors/failures.dart';
 import '../entities/factura.dart';
+import '../entities/gasto_operativo.dart';
 import '../entities/pago.dart';
 
 abstract class FinanzasRepository {
@@ -39,4 +40,14 @@ abstract class FinanzasRepository {
   Future<Either<Failure, double>> obtenerIngresosMensuales();
 
   Future<Either<Failure, double>> obtenerValorInventario();
+
+  Future<Either<Failure, GastoOperativo>> registrarGastoOperativo({
+    required String concepto,
+    required double monto,
+    String? categoria,
+  });
+
+  Future<Either<Failure, List<GastoOperativo>>> listarGastosOperativos();
+
+  Future<Either<Failure, double>> obtenerGastosOperativosMes();
 }

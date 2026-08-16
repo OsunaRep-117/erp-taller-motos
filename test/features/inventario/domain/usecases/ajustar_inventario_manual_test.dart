@@ -16,8 +16,18 @@ void main() {
     useCase = AjustarInventarioManual(repository);
   });
 
-  const admin = Usuario(id: '1', email: 'a@a.com', nombre: 'Admin', rol: RolEmpleado.admin);
-  const mecanico = Usuario(id: '2', email: 'm@m.com', nombre: 'Mecánico', rol: RolEmpleado.mecanico);
+  const admin = Usuario(
+    id: '1',
+    email: 'a@a.com',
+    nombre: 'Admin',
+    rol: RolEmpleado.admin,
+  );
+  const mecanico = Usuario(
+    id: '2',
+    email: 'm@m.com',
+    nombre: 'Mecánico',
+    rol: RolEmpleado.mecanico,
+  );
 
   group('AjustarInventarioManual', () {
     test('Sección 5.2: rechaza si quien ajusta no es Admin', () async {
@@ -33,11 +43,13 @@ void main() {
         (failure) => expect(failure.mensaje, contains('administrador')),
         (_) => fail('Un mecánico no debería poder ajustar inventario'),
       );
-      verifyNever(() => repository.ajustarInventarioManual(
-            sku: any(named: 'sku'),
-            cantidadAjuste: any(named: 'cantidadAjuste'),
-            justificacion: any(named: 'justificacion'),
-          ));
+      verifyNever(
+        () => repository.ajustarInventarioManual(
+          sku: any(named: 'sku'),
+          cantidadAjuste: any(named: 'cantidadAjuste'),
+          justificacion: any(named: 'justificacion'),
+        ),
+      );
     });
 
     test('Sección 5.2: rechaza sin justificación aunque sea Admin', () async {
@@ -52,11 +64,13 @@ void main() {
     });
 
     test('permite el ajuste cuando es Admin y trae justificación', () async {
-      when(() => repository.ajustarInventarioManual(
-            sku: 'BUJIA-01',
-            cantidadAjuste: -2,
-            justificacion: 'Merma por robo',
-          )).thenAnswer((_) async => const Right(null));
+      when(
+        () => repository.ajustarInventarioManual(
+          sku: 'BUJIA-01',
+          cantidadAjuste: -2,
+          justificacion: 'Merma por robo',
+        ),
+      ).thenAnswer((_) async => const Right(null));
 
       final resultado = await useCase(
         usuarioActual: admin,

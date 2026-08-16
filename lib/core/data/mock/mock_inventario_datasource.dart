@@ -40,18 +40,39 @@ class MockInventarioDatasource implements InventarioDataSource {
     return ref;
   }
 
+  Future<List<Map<String, dynamic>>> listarReservasPorOrden(
+    String idOrden,
+  ) async => store.obtenerReservasPorOrden(idOrden);
+
+  Future<List<Map<String, dynamic>>> listarConsumosPorOrden(
+    String idOrden,
+  ) async => store.obtenerConsumosPorOrden(idOrden);
+
   Future<void> reservarParaOrden({
     required String idOrden,
     required String sku,
     required int cantidad,
     required double precioUnitarioVenta,
-  }) async =>
-      store.reservarParaOrden(
-        idOrden: idOrden,
-        sku: sku,
-        cantidad: cantidad,
-        precioUnitarioVenta: precioUnitarioVenta,
-      );
+  }) async => store.reservarParaOrden(
+    idOrden: idOrden,
+    sku: sku,
+    cantidad: cantidad,
+    precioUnitarioVenta: precioUnitarioVenta,
+  );
+
+  Future<void> registrarConsumoParaOrden({
+    required String idOrden,
+    required String sku,
+    required int cantidad,
+    required double precioUnitario,
+    String? nombre,
+  }) async => store.registrarConsumoParaOrden(
+    idOrden: idOrden,
+    sku: sku,
+    nombre: nombre ?? sku,
+    cantidad: cantidad,
+    precioUnitario: precioUnitario,
+  );
 
   Future<void> confirmarSalidaPorOrden(String idOrden) async =>
       store.confirmarSalidaPorOrden(idOrden);
@@ -60,10 +81,9 @@ class MockInventarioDatasource implements InventarioDataSource {
     required String sku,
     required int cantidadAjuste,
     required String justificacion,
-  }) async =>
-      store.ajustarInventarioManual(
-        sku: sku,
-        cantidadAjuste: cantidadAjuste,
-        justificacion: justificacion,
-      );
+  }) async => store.ajustarInventarioManual(
+    sku: sku,
+    cantidadAjuste: cantidadAjuste,
+    justificacion: justificacion,
+  );
 }

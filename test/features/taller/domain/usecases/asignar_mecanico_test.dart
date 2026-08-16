@@ -6,7 +6,8 @@ import 'package:erp_flutter/features/taller/domain/usecases/asignar_mecanico.dar
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockOrdenTrabajoRepository extends Mock implements OrdenTrabajoRepository {}
+class MockOrdenTrabajoRepository extends Mock
+    implements OrdenTrabajoRepository {}
 
 void main() {
   late AsignarMecanico useCase;
@@ -30,33 +31,52 @@ void main() {
 
   test('debe asignar mecánico a la orden a través del repositorio', () async {
     // arrange
-    when(() => mockRepository.asignarMecanico(
-          idOrden: any(named: 'idOrden'),
-          idMecanico: any(named: 'idMecanico'),
-        )).thenAnswer((_) async => Right(tOrden));
+    when(
+      () => mockRepository.asignarMecanico(
+        idOrden: any(named: 'idOrden'),
+        idMecanico: any(named: 'idMecanico'),
+      ),
+    ).thenAnswer((_) async => Right(tOrden));
 
     // act
     final result = await useCase(idOrden: tIdOrden, idMecanico: tIdMecanico);
 
     // assert
     expect(result, Right(tOrden));
-    verify(() => mockRepository.asignarMecanico(idOrden: tIdOrden, idMecanico: tIdMecanico));
+    verify(
+      () => mockRepository.asignarMecanico(
+        idOrden: tIdOrden,
+        idMecanico: tIdMecanico,
+      ),
+    );
     verifyNoMoreInteractions(mockRepository);
   });
 
-  test('debe devolver ReglaDeNegocioFailure cuando el mecánico excede el límite', () async {
-    // arrange
-    when(() => mockRepository.asignarMecanico(
+  test(
+    'debe devolver ReglaDeNegocioFailure cuando el mecánico excede el límite',
+    () async {
+      // arrange
+      when(
+        () => mockRepository.asignarMecanico(
           idOrden: any(named: 'idOrden'),
           idMecanico: any(named: 'idMecanico'),
-        )).thenAnswer((_) async => const Left(ReglaDeNegocioFailure('Límite excedido')));
+        ),
+      ).thenAnswer(
+        (_) async => const Left(ReglaDeNegocioFailure('Límite excedido')),
+      );
 
-    // act
-    final result = await useCase(idOrden: tIdOrden, idMecanico: tIdMecanico);
+      // act
+      final result = await useCase(idOrden: tIdOrden, idMecanico: tIdMecanico);
 
-    // assert
-    expect(result, const Left(ReglaDeNegocioFailure('Límite excedido')));
-    verify(() => mockRepository.asignarMecanico(idOrden: tIdOrden, idMecanico: tIdMecanico));
-    verifyNoMoreInteractions(mockRepository);
-  });
+      // assert
+      expect(result, const Left(ReglaDeNegocioFailure('Límite excedido')));
+      verify(
+        () => mockRepository.asignarMecanico(
+          idOrden: tIdOrden,
+          idMecanico: tIdMecanico,
+        ),
+      );
+      verifyNoMoreInteractions(mockRepository);
+    },
+  );
 }

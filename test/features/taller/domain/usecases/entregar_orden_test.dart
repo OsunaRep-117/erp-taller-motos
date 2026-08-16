@@ -9,7 +9,9 @@ import 'package:erp_flutter/features/taller/domain/usecases/entregar_orden.dart'
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockOrdenTrabajoRepository extends Mock implements OrdenTrabajoRepository {}
+class MockOrdenTrabajoRepository extends Mock
+    implements OrdenTrabajoRepository {}
+
 class MockCrmRepository extends Mock implements CrmRepository {}
 
 void main() {
@@ -55,8 +57,12 @@ void main() {
       fechaCreacion: DateTime.now(),
     );
 
-    when(() => mockOrdenRepository.obtenerOrdenPorId(tIdOrden)).thenAnswer((_) async => Right(ordenSinSaldo));
-    when(() => mockOrdenRepository.marcarComoEntregada(tIdOrden)).thenAnswer((_) async => Right(ordenSinSaldo));
+    when(
+      () => mockOrdenRepository.obtenerOrdenPorId(tIdOrden),
+    ).thenAnswer((_) async => Right(ordenSinSaldo));
+    when(
+      () => mockOrdenRepository.marcarComoEntregada(tIdOrden),
+    ).thenAnswer((_) async => Right(ordenSinSaldo));
 
     final result = await useCase(tIdOrden);
 
@@ -72,32 +78,91 @@ void main() {
       esFlotilla: false,
     );
 
-    when(() => mockOrdenRepository.obtenerOrdenPorId(tIdOrden)).thenAnswer((_) async => Right(tOrdenTerminadaConSaldo));
-    when(() => mockCrmRepository.obtenerMotocicletaPorVin(tVin)).thenAnswer((_) async => Right(tMoto));
-    when(() => mockCrmRepository.obtenerClientePorId(tIdCliente)).thenAnswer((_) async => Right(clienteParticular));
+    when(
+      () => mockOrdenRepository.obtenerOrdenPorId(tIdOrden),
+    ).thenAnswer((_) async => Right(tOrdenTerminadaConSaldo));
+    when(
+      () => mockCrmRepository.obtenerMotocicletaPorVin(tVin),
+    ).thenAnswer((_) async => Right(tMoto));
+    when(
+      () => mockCrmRepository.obtenerClientePorId(tIdCliente),
+    ).thenAnswer((_) async => Right(clienteParticular));
 
     final result = await useCase(tIdOrden);
 
-    expect(result, const Left(ReglaDeNegocioFailure('Clientes particulares no pueden retirar vehículos con saldo pendiente.')));
-  });
-
-  test('debe permitir entrega con saldo si el cliente ES flotilla y tiene crédito suficiente', () async {
-    final clienteFlotilla = Cliente(
-      id: tIdCliente,
-      nombreCompleto: 'Empresa X',
-      telefono: '123',
-      esFlotilla: true,
-      limiteCredito: 5000,
+    expect(
+      result,
+      const Left(
+        ReglaDeNegocioFailure(
+          'Clientes particulares no pueden retirar vehículos con saldo pendiente.',
+        ),
+      ),
     );
-
-    when(() => mockOrdenRepository.obtenerOrdenPorId(tIdOrden)).thenAnswer((_) async => Right(tOrdenTerminadaConSaldo));
-    when(() => mockCrmRepository.obtenerMotocicletaPorVin(tVin)).thenAnswer((_) async => Right(tMoto));
-    when(() => mockCrmRepository.obtenerClientePorId(tIdCliente)).thenAnswer((_) async => Right(clienteFlotilla));
-    when(() => mockOrdenRepository.marcarComoEntregada(tIdOrden)).thenAnswer((_) async => Right(tOrdenTerminadaConSaldo));
-
-    final result = await useCase(tIdOrden);
-
-    expect(result, Right(tOrdenTerminadaConSaldo));
-    verify(() => mockOrdenRepository.marcarComoEntregada(tIdOrden));
   });
+
+  test(
+    'debe permitir entrega con saldo si el cliente ES flotilla y tiene crédito suficiente',
+    () async {
+      final clienteFlotilla = Cliente(
+        id: tIdCliente,
+        nombreCompleto: 'Empresa X',
+        telefono: '123',
+        esFlotilla: true,
+        limiteCredito: 5000,
+      );
+
+      when(
+        () => mockOrdenRepository.obtenerOrdenPorId(tIdOrden),
+      ).thenAnswer((_) async => Right(tOrdenTerminadaConSaldo));
+      when(
+        () => mockCrmRepository.obtenerMotocicletaPorVin(tVin),
+      ).thenAnswer((_) async => Right(tMoto));
+      when(
+        () => mockCrmRepository.obtenerClientePorId(tIdCliente),
+      ).thenAnswer((_) async => Right(clienteFlotilla));
+      when(
+        () => mockCrmRepository.calcularExposicionCredito(tIdCliente),
+      ).thenAnswer((_) async => const Right(1000));
+      when(
+        () => mockOrdenRepository.marcarComoEntregada(tIdOrden),
+      ).thenAnswer((_) async => Right(tOrdenTerminadaConSaldo));
+
+      final result = await useCase(tIdOrden);
+
+      expect(result, Right(tOrdenTerminadaConSaldo));
+      verify(() => mockOrdenRepository.marcarComoEntregada(tIdOrden));
+      verify(() => mockCrmRepository.calcularExposicionCredito(tIdCliente));
+    },
+  );
+
+  test(
+    'debe fallar entrega con saldo si la exposición supera el límite de crédito',
+    () async {
+      final clienteFlotilla = Cliente(
+        id: tIdCliente,
+        nombreCompleto: 'Empresa X',
+        telefono: '123',
+        esFlotilla: true,
+        limiteCredito: 500,
+      );
+
+      when(
+        () => mockOrdenRepository.obtenerOrdenPorId(tIdOrden),
+      ).thenAnswer((_) async => Right(tOrdenTerminadaConSaldo));
+      when(
+        () => mockCrmRepository.obtenerMotocicletaPorVin(tVin),
+      ).thenAnswer((_) async => Right(tMoto));
+      when(
+        () => mockCrmRepository.obtenerClientePorId(tIdCliente),
+      ).thenAnswer((_) async => Right(clienteFlotilla));
+      when(
+        () => mockCrmRepository.calcularExposicionCredito(tIdCliente),
+      ).thenAnswer((_) async => const Right(1000));
+
+      final result = await useCase(tIdOrden);
+
+      expect(result.isLeft(), true);
+      verifyNever(() => mockOrdenRepository.marcarComoEntregada(any()));
+    },
+  );
 }

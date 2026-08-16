@@ -29,4 +29,10 @@ abstract class CrmDataSource {
     required int anio,
     required String idCliente,
   });
+
+  /// Suma saldo pendiente en OT activas del cliente (§5.4).
+  Future<double> calcularExposicionCredito(String idCliente);
+
+  /// True si cliente flotilla tiene OT con adeudo > 30 días (§5.4).
+  Future<bool> clienteFlotillaMoroso(String idCliente);
 }

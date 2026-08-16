@@ -11,10 +11,12 @@ class InvitarEmpleadoGoogleScreen extends ConsumerStatefulWidget {
   const InvitarEmpleadoGoogleScreen({super.key});
 
   @override
-  ConsumerState<InvitarEmpleadoGoogleScreen> createState() => _InvitarEmpleadoGoogleScreenState();
+  ConsumerState<InvitarEmpleadoGoogleScreen> createState() =>
+      _InvitarEmpleadoGoogleScreenState();
 }
 
-class _InvitarEmpleadoGoogleScreenState extends ConsumerState<InvitarEmpleadoGoogleScreen> {
+class _InvitarEmpleadoGoogleScreenState
+    extends ConsumerState<InvitarEmpleadoGoogleScreen> {
   final _nombreController = TextEditingController();
   final _emailController = TextEditingController();
   RolEmpleado _rol = RolEmpleado.mecanico;
@@ -25,7 +27,9 @@ class _InvitarEmpleadoGoogleScreenState extends ConsumerState<InvitarEmpleadoGoo
     if (admin == null) return;
 
     setState(() => _procesando = true);
-    final resultado = await ref.read(rrhhRepositoryProvider).invitarEmpleadoGoogle(
+    final resultado = await ref
+        .read(rrhhRepositoryProvider)
+        .invitarEmpleadoGoogle(
           nombre: _nombreController.text.trim(),
           email: _emailController.text.trim(),
           rol: _rol.name,
@@ -36,7 +40,9 @@ class _InvitarEmpleadoGoogleScreenState extends ConsumerState<InvitarEmpleadoGoo
     setState(() => _procesando = false);
 
     resultado.fold(
-      (f) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(f.mensaje))),
+      (f) => ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(f.mensaje))),
       (_) {
         ref.invalidate(invitacionesPendientesProvider);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -97,9 +103,13 @@ class _InvitarEmpleadoGoogleScreenState extends ConsumerState<InvitarEmpleadoGoo
               value: _rol,
               decoration: const InputDecoration(labelText: 'Rol en el ERP'),
               items: RolEmpleado.values
-                  .map((r) => DropdownMenuItem(value: r, child: Text(_rolLabel(r))))
+                  .map(
+                    (r) =>
+                        DropdownMenuItem(value: r, child: Text(_rolLabel(r))),
+                  )
                   .toList(),
-              onChanged: (v) => setState(() => _rol = v ?? RolEmpleado.mecanico),
+              onChanged: (v) =>
+                  setState(() => _rol = v ?? RolEmpleado.mecanico),
             ),
             const SizedBox(height: 24),
             FilledButton.icon(

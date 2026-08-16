@@ -40,4 +40,9 @@ abstract class CrmRepository {
     required int anio,
     required String idCliente,
   });
+
+  /// Suma saldo pendiente en OT activas del cliente (§5.4).
+  Future<Either<Failure, double>> calcularExposicionCredito(String idCliente);
+
+  Future<Either<Failure, bool>> clienteFlotillaMoroso(String idCliente);
 }

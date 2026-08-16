@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/errors/failures.dart';
+import '../entities/evidencia_ot.dart';
 
 abstract class EvidenciaOtRepository {
   Future<Either<Failure, String>> subirEvidencia({
@@ -11,4 +12,6 @@ abstract class EvidenciaOtRepository {
     required String nombreArchivo,
     required String etapa,
   });
+
+  Future<Either<Failure, List<EvidenciaOt>>> listarPorOrden(String idOrden);
 }

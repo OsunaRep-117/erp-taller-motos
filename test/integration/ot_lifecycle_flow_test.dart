@@ -27,7 +27,13 @@ void main() {
       idMecanico: 'emp-mec',
     );
     expect(asignada.isRight(), true);
-    expect(asignada.getOrElse(() => throw StateError('')).estado, EstadoOrdenTrabajo.enProceso);
+    expect(
+      asignada.getOrElse(() => throw StateError('')).estado,
+      EstadoOrdenTrabajo.enProceso,
+    );
+
+    final aprobada = await h.aprobarPresupuesto(idOrden);
+    expect(aprobada.isRight(), true);
 
     final reserva = await h.solicitarRefaccion(
       idOrden: idOrden,
@@ -36,10 +42,17 @@ void main() {
     );
     expect(reserva, const Right(null));
 
-    final horas = await h.ordenRepo.actualizarHorasFacturables(idOrden: idOrden, horas: 2);
+    final horas = await h.ordenRepo.actualizarHorasFacturables(
+      idOrden: idOrden,
+      horas: 2,
+    );
     expect(horas.isRight(), true);
 
-    final terminada = await h.terminarOrden(idOrden);
+    await h.loginMecanico();
+    final terminada = await h.terminarOrdenUseCase(
+      idOrden: idOrden,
+      idEmpleadoActual: 'emp-mec',
+    );
     expect(terminada.isRight(), true);
     final otTerminada = terminada.getOrElse(() => throw StateError(''));
     expect(otTerminada.estado, EstadoOrdenTrabajo.terminado);
@@ -58,26 +71,36 @@ void main() {
 
     final entregada = await h.entregarOrden(idOrden);
     expect(entregada.isRight(), true);
-    expect(entregada.getOrElse(() => throw StateError('')).estado, EstadoOrdenTrabajo.entregado);
-  });
-
-  test('flujo OT existente ot-002: asignar mecánico y reservar pieza', () async {
-    await h.loginAdmin();
-
-    const idOrden = 'ot-002';
-
-    final asignada = await h.asignarMecanico(idOrden: idOrden, idMecanico: 'emp-mec');
-    expect(asignada.isRight(), true);
-
-    final reserva = await h.solicitarRefaccion(
-      idOrden: idOrden,
-      sku: 'PAST-001',
-      cantidad: 1,
+    expect(
+      entregada.getOrElse(() => throw StateError('')).estado,
+      EstadoOrdenTrabajo.entregado,
     );
-    expect(reserva, const Right(null));
-
-    final ot = await h.orden(idOrden);
-    expect(ot.idMecanico, 'emp-mec');
-    expect(ot.estado, EstadoOrdenTrabajo.enProceso);
   });
+
+  test(
+    'flujo OT existente ot-002: asignar mecánico y reservar pieza',
+    () async {
+      await h.loginAdmin();
+
+      const idOrden = 'ot-002';
+
+      final asignada = await h.asignarMecanico(
+        idOrden: idOrden,
+        idMecanico: 'emp-mec',
+      );
+      expect(asignada.isRight(), true);
+      await h.aprobarPresupuesto(idOrden);
+
+      final reserva = await h.solicitarRefaccion(
+        idOrden: idOrden,
+        sku: 'PAST-001',
+        cantidad: 1,
+      );
+      expect(reserva, const Right(null));
+
+      final ot = await h.orden(idOrden);
+      expect(ot.idMecanico, 'emp-mec');
+      expect(ot.estado, EstadoOrdenTrabajo.enProceso);
+    },
+  );
 }

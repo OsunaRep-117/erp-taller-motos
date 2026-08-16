@@ -1,60 +1,96 @@
 import 'package:dartz/dartz.dart';
 import 'package:erp_flutter/core/errors/failures.dart';
-import 'package:erp_flutter/features/inventario/domain/usecases/confirmar_salida_inventario.dart';
 import 'package:erp_flutter/features/taller/domain/entities/orden_trabajo.dart';
 import 'package:erp_flutter/features/taller/domain/repositories/orden_trabajo_repository.dart';
 import 'package:erp_flutter/features/taller/domain/usecases/terminar_orden.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockOrdenTrabajoRepository extends Mock implements OrdenTrabajoRepository {}
-class MockConfirmarSalidaInventario extends Mock implements ConfirmarSalidaInventario {}
+class MockOrdenTrabajoRepository extends Mock
+    implements OrdenTrabajoRepository {}
 
 void main() {
   late TerminarOrden useCase;
   late MockOrdenTrabajoRepository mockOrdenRepository;
-  late MockConfirmarSalidaInventario mockInventarioUseCase;
 
   setUp(() {
     mockOrdenRepository = MockOrdenTrabajoRepository();
-    mockInventarioUseCase = MockConfirmarSalidaInventario();
-    useCase = TerminarOrden(mockOrdenRepository, mockInventarioUseCase);
+    useCase = TerminarOrden(mockOrdenRepository);
   });
 
   const tIdOrden = 'ORD-1';
-  final tOrden = OrdenTrabajo(
+  const tIdMecanico = 'emp-mec';
+
+  final tOrdenAsignada = OrdenTrabajo(
     id: tIdOrden,
     idMoto: 'MOTO-1',
-    estado: EstadoOrdenTrabajo.terminado,
+    idMecanico: tIdMecanico,
+    estado: EstadoOrdenTrabajo.enProceso,
     fallaReportada: 'Falla',
     fechaCreacion: DateTime.now(),
   );
 
-  test('debe confirmar salida de inventario y luego marcar orden como terminada', () async {
-    // arrange
-    when(() => mockInventarioUseCase(any())).thenAnswer((_) async => const Right(null));
-    when(() => mockOrdenRepository.marcarComoTerminada(any())).thenAnswer((_) async => Right(tOrden));
+  final tOrdenTerminada = tOrdenAsignada.copyWith(
+    estado: EstadoOrdenTrabajo.terminado,
+    saldoPendiente: 700,
+  );
 
-    // act
-    final result = await useCase(tIdOrden);
+  test(
+    'debe marcar orden como terminada cuando el mecánico asignado la termina',
+    () async {
+      when(
+        () => mockOrdenRepository.obtenerOrdenPorId(tIdOrden),
+      ).thenAnswer((_) async => Right(tOrdenAsignada));
+      when(
+        () => mockOrdenRepository.marcarComoTerminada(tIdOrden),
+      ).thenAnswer((_) async => Right(tOrdenTerminada));
 
-    // assert
-    expect(result, Right(tOrden));
-    verify(() => mockInventarioUseCase(tIdOrden));
-    verify(() => mockOrdenRepository.marcarComoTerminada(tIdOrden));
+      final result = await useCase(
+        idOrden: tIdOrden,
+        idEmpleadoActual: tIdMecanico,
+      );
+
+      expect(result, Right(tOrdenTerminada));
+      verify(() => mockOrdenRepository.marcarComoTerminada(tIdOrden));
+    },
+  );
+
+  test('debe fallar si la orden no tiene mecánico asignado', () async {
+    final sinMecanico = tOrdenAsignada.copyWith(idMecanico: null);
+    when(
+      () => mockOrdenRepository.obtenerOrdenPorId(tIdOrden),
+    ).thenAnswer((_) async => Right(sinMecanico));
+
+    final result = await useCase(
+      idOrden: tIdOrden,
+      idEmpleadoActual: tIdMecanico,
+    );
+
+    expect(
+      result,
+      const Left(ReglaDeNegocioFailure('La orden no tiene mecánico asignado.')),
+    );
+    verifyNever(() => mockOrdenRepository.marcarComoTerminada(any()));
   });
 
-  test('debe fallar si la confirmación de inventario falla', () async {
-    // arrange
-    const tFailure = ServerFailure('Error en inventario');
-    when(() => mockInventarioUseCase(any())).thenAnswer((_) async => const Left(tFailure));
+  test('debe fallar si quien termina no es el mecánico asignado', () async {
+    when(
+      () => mockOrdenRepository.obtenerOrdenPorId(tIdOrden),
+    ).thenAnswer((_) async => Right(tOrdenAsignada));
 
-    // act
-    final result = await useCase(tIdOrden);
+    final result = await useCase(
+      idOrden: tIdOrden,
+      idEmpleadoActual: 'otro-empleado',
+    );
 
-    // assert
-    expect(result, const Left(tFailure));
-    verify(() => mockInventarioUseCase(tIdOrden));
+    expect(
+      result,
+      const Left(
+        ReglaDeNegocioFailure(
+          'Solo el mecánico asignado puede marcar la orden como terminada.',
+        ),
+      ),
+    );
     verifyNever(() => mockOrdenRepository.marcarComoTerminada(any()));
   });
 }

@@ -14,9 +14,14 @@ class RegistrarVenta {
   final PosRepository repository;
   const RegistrarVenta(this.repository);
 
-  Future<Either<Failure, String>> call(List<ItemCarrito> items, {String metodoPago = 'efectivo'}) {
+  Future<Either<Failure, String>> call(
+    List<ItemCarrito> items, {
+    String metodoPago = 'efectivo',
+  }) {
     if (items.isEmpty) {
-      return Future.value(const Left(ReglaDeNegocioFailure('El carrito está vacío.')));
+      return Future.value(
+        const Left(ReglaDeNegocioFailure('El carrito está vacío.')),
+      );
     }
     return repository.registrarVenta(items, metodoPago: metodoPago);
   }

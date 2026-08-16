@@ -14,7 +14,9 @@ class RrhhRepositoryImpl implements RrhhRepository {
   const RrhhRepositoryImpl(this.remote);
 
   @override
-  Future<Either<Failure, List<Comision>>> listarComisionesDeMecanico(String idMecanico) async {
+  Future<Either<Failure, List<Comision>>> listarComisionesDeMecanico(
+    String idMecanico,
+  ) async {
     try {
       final comisiones = await remote.listarComisionesDeMecanico(idMecanico);
       return Right(comisiones);
@@ -65,12 +67,17 @@ class RrhhRepositoryImpl implements RrhhRepository {
     } on PostgrestException catch (e) {
       return Left(ServerFailure(e.message));
     } catch (e) {
-      return Left(ReglaDeNegocioFailure(e.toString().replaceFirst('Exception: ', '')));
+      return Left(
+        ReglaDeNegocioFailure(e.toString().replaceFirst('Exception: ', '')),
+      );
     }
   }
 
   @override
-  Future<Either<Failure, void>> actualizarRolEmpleado(String idEmpleado, String nuevoRol) async {
+  Future<Either<Failure, void>> actualizarRolEmpleado(
+    String idEmpleado,
+    String nuevoRol,
+  ) async {
     try {
       await remote.actualizarRolEmpleado(idEmpleado, nuevoRol);
       return const Right(null);
@@ -111,12 +118,15 @@ class RrhhRepositoryImpl implements RrhhRepository {
     } on PostgrestException catch (e) {
       return Left(ServerFailure(e.message));
     } catch (e) {
-      return Left(ReglaDeNegocioFailure(e.toString().replaceFirst('Exception: ', '')));
+      return Left(
+        ReglaDeNegocioFailure(e.toString().replaceFirst('Exception: ', '')),
+      );
     }
   }
 
   @override
-  Future<Either<Failure, List<EmpleadoInvitacion>>> listarInvitacionesPendientes() async {
+  Future<Either<Failure, List<EmpleadoInvitacion>>>
+  listarInvitacionesPendientes() async {
     try {
       return Right(await remote.listarInvitacionesPendientes());
     } on PostgrestException catch (e) {

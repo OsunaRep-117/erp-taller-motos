@@ -17,7 +17,9 @@ class ActualizarMotocicleta {
     required String idCliente,
   }) {
     if (anio < 1980 || anio > DateTime.now().year + 1) {
-      return Future.value(const Left(ReglaDeNegocioFailure('Año fuera de rango.')));
+      return Future.value(
+        const Left(ReglaDeNegocioFailure('Año fuera de rango.')),
+      );
     }
     return repository.actualizarMotocicleta(
       vin: vin,

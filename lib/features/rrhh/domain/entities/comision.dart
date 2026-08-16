@@ -18,5 +18,12 @@ class Comision extends Equatable {
   });
 
   @override
-  List<Object?> get props => [id, idOrden, idMecanico, monto, porcentajeAplicado, fechaGenerada];
+  List<Object?> get props => [
+    id,
+    idOrden,
+    idMecanico,
+    monto,
+    porcentajeAplicado,
+    fechaGenerada,
+  ];
 }

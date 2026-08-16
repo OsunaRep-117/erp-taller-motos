@@ -19,5 +19,12 @@ class EstadoHistorial extends Equatable {
   });
 
   @override
-  List<Object?> get props => [id, idOrden, estadoAnterior, estadoNuevo, fechaCambio, idUsuario];
+  List<Object?> get props => [
+    id,
+    idOrden,
+    estadoAnterior,
+    estadoNuevo,
+    fechaCambio,
+    idUsuario,
+  ];
 }

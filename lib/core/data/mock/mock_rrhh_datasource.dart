@@ -30,7 +30,9 @@ class MockRrhhDatasource implements RrhhDataSource {
     required RolEmpleado rol,
   }) async {
     store.ensureSeeded();
-    if (store.empleados.any((e) => e.email.toLowerCase() == email.toLowerCase())) {
+    if (store.empleados.any(
+      (e) => e.email.toLowerCase() == email.toLowerCase(),
+    )) {
       throw Exception('Ya existe un empleado con ese correo.');
     }
     final emp = Empleado(

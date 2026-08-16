@@ -1,14 +1,18 @@
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/errors/failures.dart';
+import '../../../taller/domain/repositories/orden_trabajo_repository.dart';
 import '../repositories/inventario_repository.dart';
 
-/// Regla de Soft Allocation (Sección 5.2 del documento maestro):
-/// al aprobarse la cotización de una pieza, el stock no se borra,
-/// pero el stock disponible para venta disminuye.
+/// Regla de Soft Allocation (Sección 5.2): requiere presupuesto aprobado.
 class SolicitarRefaccionParaOrden {
-  final InventarioRepository repository;
-  const SolicitarRefaccionParaOrden(this.repository);
+  final InventarioRepository inventarioRepository;
+  final OrdenTrabajoRepository ordenRepository;
+
+  const SolicitarRefaccionParaOrden(
+    this.inventarioRepository,
+    this.ordenRepository,
+  );
 
   Future<Either<Failure, void>> call({
     required String idOrden,
@@ -16,26 +20,54 @@ class SolicitarRefaccionParaOrden {
     required int cantidad,
   }) async {
     if (cantidad <= 0) {
-      return const Left(ReglaDeNegocioFailure('La cantidad debe ser mayor a 0.'));
+      return const Left(
+        ReglaDeNegocioFailure('La cantidad debe ser mayor a 0.'),
+      );
     }
 
-    final refaccionResult = await repository.obtenerPorSku(sku);
+    final ordenResult = await ordenRepository.obtenerOrdenPorId(idOrden);
+    if (ordenResult.isLeft()) {
+      return ordenResult.fold(
+        (f) => Left(f),
+        (_) => throw StateError('unreachable'),
+      );
+    }
+    final orden = ordenResult.getOrElse(() => throw StateError('unreachable'));
+
+    if (!orden.presupuestoAprobado) {
+      return const Left(
+        ReglaDeNegocioFailure(
+          'Debe aprobar el presupuesto antes de reservar refacciones.',
+        ),
+      );
+    }
+
+    final refaccionResult = await inventarioRepository.obtenerPorSku(sku);
     if (refaccionResult.isLeft()) {
-      return refaccionResult.fold((f) => Left(f), (r) => throw StateError('unreachable'));
+      return refaccionResult.fold(
+        (f) => Left(f),
+        (_) => throw StateError('unreachable'),
+      );
     }
 
-    final refaccion = refaccionResult.getOrElse(() => throw StateError('unreachable'));
+    final refaccion = refaccionResult.getOrElse(
+      () => throw StateError('unreachable'),
+    );
 
     if (refaccion.inactivo) {
-      return const Left(ReglaDeNegocioFailure('Esta refacción está dada de baja.'));
+      return const Left(
+        ReglaDeNegocioFailure('Esta refacción está dada de baja.'),
+      );
     }
     if (refaccion.stockDisponible < cantidad) {
-      return Left(ReglaDeNegocioFailure(
-        'Stock insuficiente: disponible ${refaccion.stockDisponible}, solicitado $cantidad.',
-      ));
+      return Left(
+        ReglaDeNegocioFailure(
+          'Stock insuficiente: disponible ${refaccion.stockDisponible}, solicitado $cantidad.',
+        ),
+      );
     }
 
-    return repository.reservarParaOrden(
+    return inventarioRepository.reservarParaOrden(
       idOrden: idOrden,
       sku: sku,
       cantidad: cantidad,

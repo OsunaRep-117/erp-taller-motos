@@ -36,15 +36,23 @@ void main() {
   );
 
   group('EmitirFactura', () {
-    test('Sección 6.10: rechaza si la orden todavía tiene saldo pendiente', () async {
-      final resultado = await useCase(orden: ordenConSaldo, rfcReceptor: 'ABC123456XYZ');
+    test(
+      'Sección 6.10: rechaza si la orden todavía tiene saldo pendiente',
+      () async {
+        final resultado = await useCase(
+          orden: ordenConSaldo,
+          rfcReceptor: 'ABC123456XYZ',
+        );
 
-      expect(resultado.isLeft(), true);
-      verifyNever(() => repository.emitirFactura(
+        expect(resultado.isLeft(), true);
+        verifyNever(
+          () => repository.emitirFactura(
             idOrden: any(named: 'idOrden'),
             rfcReceptor: any(named: 'rfcReceptor'),
-          ));
-    });
+          ),
+        );
+      },
+    );
 
     test('rechaza RFC vacío aunque el saldo esté en cero', () async {
       final resultado = await useCase(orden: ordenSaldada, rfcReceptor: '   ');
@@ -60,10 +68,17 @@ void main() {
         estado: EstadoFactura.vigente,
         fechaEmision: DateTime(2026, 1, 2),
       );
-      when(() => repository.emitirFactura(idOrden: 'ORD-1', rfcReceptor: 'ABC123456XYZ'))
-          .thenAnswer((_) async => Right(facturaEsperada));
+      when(
+        () => repository.emitirFactura(
+          idOrden: 'ORD-1',
+          rfcReceptor: 'ABC123456XYZ',
+        ),
+      ).thenAnswer((_) async => Right(facturaEsperada));
 
-      final resultado = await useCase(orden: ordenSaldada, rfcReceptor: 'ABC123456XYZ');
+      final resultado = await useCase(
+        orden: ordenSaldada,
+        rfcReceptor: 'ABC123456XYZ',
+      );
 
       expect(resultado, Right(facturaEsperada));
     });

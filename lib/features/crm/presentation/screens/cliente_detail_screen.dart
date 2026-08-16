@@ -11,7 +11,8 @@ class ClienteDetailScreen extends ConsumerStatefulWidget {
   const ClienteDetailScreen({super.key, required this.id});
 
   @override
-  ConsumerState<ClienteDetailScreen> createState() => _ClienteDetailScreenState();
+  ConsumerState<ClienteDetailScreen> createState() =>
+      _ClienteDetailScreenState();
 }
 
 class _ClienteDetailScreenState extends ConsumerState<ClienteDetailScreen> {
@@ -36,7 +37,9 @@ class _ClienteDetailScreenState extends ConsumerState<ClienteDetailScreen> {
     final cliente = original.copyWith(
       nombreCompleto: _nombreController.text.trim(),
       telefono: _telefonoController.text.trim(),
-      rfc: _rfcController.text.trim().isEmpty ? null : _rfcController.text.trim(),
+      rfc: _rfcController.text.trim().isEmpty
+          ? null
+          : _rfcController.text.trim(),
       esFlotilla: _esFlotilla,
       limiteCredito: double.tryParse(_limiteController.text) ?? 0,
     );
@@ -47,11 +50,15 @@ class _ClienteDetailScreenState extends ConsumerState<ClienteDetailScreen> {
       _editando = false;
     });
     resultado.fold(
-      (f) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(f.mensaje))),
+      (f) => ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(f.mensaje))),
       (_) {
         ref.invalidate(clientesDisponiblesProvider);
         ref.invalidate(clientePorIdProvider(widget.id));
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Cliente actualizado.')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Cliente actualizado.')));
       },
     );
   }
@@ -73,12 +80,13 @@ class _ClienteDetailScreenState extends ConsumerState<ClienteDetailScreen> {
       title: 'Detalle cliente',
       actions: [
         clienteAsync.maybeWhen(
-          data: (c) => IconButton(
-            icon: Icon(_editando ? Icons.close : Icons.edit),
-            onPressed: () => setState(() => _editando = !_editando),
-          ),
-          orElse: () => null,
-        ) ?? const SizedBox.shrink(),
+              data: (c) => IconButton(
+                icon: Icon(_editando ? Icons.close : Icons.edit),
+                onPressed: () => setState(() => _editando = !_editando),
+              ),
+              orElse: () => null,
+            ) ??
+            const SizedBox.shrink(),
       ],
       body: clienteAsync.when(
         data: (cliente) {
@@ -88,12 +96,23 @@ class _ClienteDetailScreenState extends ConsumerState<ClienteDetailScreen> {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  TextField(controller: _nombreController, decoration: const InputDecoration(labelText: 'Nombre')),
-                  TextField(controller: _telefonoController, decoration: const InputDecoration(labelText: 'Teléfono')),
-                  TextField(controller: _rfcController, decoration: const InputDecoration(labelText: 'RFC')),
+                  TextField(
+                    controller: _nombreController,
+                    decoration: const InputDecoration(labelText: 'Nombre'),
+                  ),
+                  TextField(
+                    controller: _telefonoController,
+                    decoration: const InputDecoration(labelText: 'Teléfono'),
+                  ),
+                  TextField(
+                    controller: _rfcController,
+                    decoration: const InputDecoration(labelText: 'RFC'),
+                  ),
                   TextField(
                     controller: _limiteController,
-                    decoration: const InputDecoration(labelText: 'Límite crédito'),
+                    decoration: const InputDecoration(
+                      labelText: 'Límite crédito',
+                    ),
                     keyboardType: TextInputType.number,
                   ),
                   SwitchListTile(
@@ -105,7 +124,11 @@ class _ClienteDetailScreenState extends ConsumerState<ClienteDetailScreen> {
                   FilledButton(
                     onPressed: _procesando ? null : () => _guardar(cliente),
                     child: _procesando
-                        ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
                         : const Text('Guardar'),
                   ),
                 ],
@@ -115,10 +138,22 @@ class _ClienteDetailScreenState extends ConsumerState<ClienteDetailScreen> {
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              ListTile(title: const Text('Nombre'), subtitle: Text(cliente.nombreCompleto)),
-              ListTile(title: const Text('Teléfono'), subtitle: Text(cliente.telefono)),
-              ListTile(title: const Text('RFC'), subtitle: Text(cliente.rfc ?? '—')),
-              ListTile(title: const Text('Flotilla'), subtitle: Text(cliente.esFlotilla ? 'Sí' : 'No')),
+              ListTile(
+                title: const Text('Nombre'),
+                subtitle: Text(cliente.nombreCompleto),
+              ),
+              ListTile(
+                title: const Text('Teléfono'),
+                subtitle: Text(cliente.telefono),
+              ),
+              ListTile(
+                title: const Text('RFC'),
+                subtitle: Text(cliente.rfc ?? '—'),
+              ),
+              ListTile(
+                title: const Text('Flotilla'),
+                subtitle: Text(cliente.esFlotilla ? 'Sí' : 'No'),
+              ),
               ListTile(
                 title: const Text('Límite crédito'),
                 subtitle: Text('\$${cliente.limiteCredito.toStringAsFixed(2)}'),

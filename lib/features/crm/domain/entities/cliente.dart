@@ -4,7 +4,7 @@ part 'cliente.freezed.dart';
 part 'cliente.g.dart';
 
 @freezed
-class Cliente with _$Cliente {
+abstract class Cliente with _$Cliente {
   const Cliente._();
 
   const factory Cliente({
@@ -16,8 +16,10 @@ class Cliente with _$Cliente {
     @Default(false) bool esFlotilla,
   }) = _Cliente;
 
-  factory Cliente.fromJson(Map<String, dynamic> json) => _$ClienteFromJson(json);
+  factory Cliente.fromJson(Map<String, dynamic> json) =>
+      _$ClienteFromJson(json);
 
   bool get esValido =>
-      telefono.trim().isNotEmpty && (!esFlotilla || (rfc?.trim().isNotEmpty ?? false));
+      telefono.trim().isNotEmpty &&
+      (!esFlotilla || (rfc?.trim().isNotEmpty ?? false));
 }

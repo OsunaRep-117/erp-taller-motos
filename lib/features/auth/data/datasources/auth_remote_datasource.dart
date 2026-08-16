@@ -92,7 +92,8 @@ class AuthRemoteDatasource {
 
       return _resolverAccesoEmpleado(
         authUser,
-        nombreGoogle: googleUser.displayName ?? authUser.email?.split('@').first,
+        nombreGoogle:
+            googleUser.displayName ?? authUser.email?.split('@').first,
       );
     } on PlatformException catch (e) {
       if (e.code == '10') {
@@ -116,8 +117,9 @@ class AuthRemoteDatasource {
       await client.auth.signInWithOAuth(
         OAuthProvider.google,
         redirectTo: redirectTo,
-        authScreenLaunchMode:
-            kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication,
+        authScreenLaunchMode: kIsWeb
+            ? LaunchMode.platformDefault
+            : LaunchMode.externalApplication,
         queryParams: const {
           'prompt': 'select_account',
           'access_type': 'offline',
@@ -139,7 +141,9 @@ class AuthRemoteDatasource {
     ultimoErrorAcceso = null;
     if (!kIsWeb && AppConfig.googleWebClientId.isNotEmpty) {
       try {
-        await GoogleSignIn(serverClientId: AppConfig.googleWebClientId).signOut();
+        await GoogleSignIn(
+          serverClientId: AppConfig.googleWebClientId,
+        ).signOut();
       } catch (_) {}
     }
     await client.auth.signOut(scope: SignOutScope.global);
@@ -157,8 +161,14 @@ class AuthRemoteDatasource {
     }
   }
 
-  Stream<Usuario?> observarEstadoAuth() {
-    return client.auth.onAuthStateChange.asyncMap((data) async {
+  Stream<Usuario?> observarEstadoAuth() async* {
+    // Emitimos el estado actual de inmediato: onAuthStateChange no siempre
+    // repite un evento retroactivo si la sesión ya estaba activa (ej. tras
+    // un hot-restart o recarga de página), lo que dejaba el stream sin
+    // emitir nada y las pantallas protegidas por rol cargando para siempre.
+    yield await obtenerUsuarioActual();
+
+    yield* client.auth.onAuthStateChange.asyncMap((data) async {
       final authUser = data.session?.user;
       if (authUser == null) return null;
       try {
@@ -171,20 +181,27 @@ class AuthRemoteDatasource {
     });
   }
 
-  Future<Usuario> _resolverAccesoEmpleado(User authUser, {String? nombreGoogle}) async {
+  Future<Usuario> _resolverAccesoEmpleado(
+    User authUser, {
+    String? nombreGoogle,
+  }) async {
     final meta = authUser.userMetadata;
-    final nombre = nombreGoogle ??
+    final nombre =
+        nombreGoogle ??
         meta?['full_name'] as String? ??
         meta?['name'] as String? ??
         authUser.email?.split('@').first ??
         'Usuario';
 
     try {
-      final data = await client.rpc('resolver_acceso_empleado', params: {
-        'p_user_id': authUser.id,
-        'p_email': authUser.email ?? '',
-        'p_nombre': nombre,
-      });
+      final data = await client.rpc(
+        'resolver_acceso_empleado',
+        params: {
+          'p_user_id': authUser.id,
+          'p_email': authUser.email ?? '',
+          'p_nombre': nombre,
+        },
+      );
 
       if (data is! Map<String, dynamic>) {
         throw const AuthException('No se pudo resolver el acceso al ERP.');
@@ -203,7 +220,8 @@ class AuthRemoteDatasource {
       );
     } on PostgrestException catch (e) {
       await client.auth.signOut();
-      if (e.code == 'PGRST202' || e.message.contains('resolver_acceso_empleado')) {
+      if (e.code == 'PGRST202' ||
+          e.message.contains('resolver_acceso_empleado')) {
         throw const AuthException(
           'Falta la función resolver_acceso_empleado. '
           'Ejecuta supabase/migrations/003_empleados_invitados.sql en Supabase.',
@@ -214,7 +232,8 @@ class AuthRemoteDatasource {
   }
 
   static String _mensajeGoogleConfig(String raw) {
-    if (raw.contains('missing OAuth secret') || raw.contains('Unsupported provider')) {
+    if (raw.contains('missing OAuth secret') ||
+        raw.contains('Unsupported provider')) {
       final redirect = kIsWeb ? Uri.base.origin : AppConfig.oauthRedirectUrl;
       return 'Configura Google en Supabase → Authentication → Providers → Google:\n'
           '• Client ID (Web): tu GOOGLE_WEB_CLIENT_ID\n'
@@ -228,7 +247,8 @@ class AuthRemoteDatasource {
   static String mensajeAmigable(Object error) {
     final texto = error.toString();
     if (error is AuthException) return error.message;
-    if (texto.contains('people.googleapis.com') || texto.contains('People API')) {
+    if (texto.contains('people.googleapis.com') ||
+        texto.contains('People API')) {
       return 'Activa People API en Google Cloud (proyecto 674051757213):\n'
           'https://console.developers.google.com/apis/api/people.googleapis.com/overview?project=674051757213\n\n'
           'En web usamos OAuth de Supabase; si persiste, verifica Client Secret en Supabase → Google.';

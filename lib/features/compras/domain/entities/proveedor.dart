@@ -4,7 +4,7 @@ part 'proveedor.freezed.dart';
 part 'proveedor.g.dart';
 
 @freezed
-class Proveedor with _$Proveedor {
+abstract class Proveedor with _$Proveedor {
   const factory Proveedor({
     required String id,
     required String nombre,
@@ -12,5 +12,6 @@ class Proveedor with _$Proveedor {
     String? rfc,
   }) = _Proveedor;
 
-  factory Proveedor.fromJson(Map<String, dynamic> json) => _$ProveedorFromJson(json);
+  factory Proveedor.fromJson(Map<String, dynamic> json) =>
+      _$ProveedorFromJson(json);
 }

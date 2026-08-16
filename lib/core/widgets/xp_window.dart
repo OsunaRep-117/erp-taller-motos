@@ -147,7 +147,10 @@ class XpPanel extends StatelessWidget {
               color: XpColors.windowBg,
               child: Text(
                 title!,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
               ),
             ),
           Padding(padding: padding, child: child),
@@ -182,11 +185,18 @@ class XpKpiCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 11, color: Colors.black54),
+          ),
           const SizedBox(height: 4),
           Text(
             value,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: accent),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: accent,
+            ),
           ),
         ],
       ),
@@ -221,7 +231,9 @@ class XpEntityCard extends StatelessWidget {
           onTap: onTap,
           child: Container(
             decoration: BoxDecoration(
-              border: Border.all(color: XpColors.borderDark.withValues(alpha: 0.5)),
+              border: Border.all(
+                color: XpColors.borderDark.withValues(alpha: 0.5),
+              ),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             child: Row(
@@ -235,7 +247,10 @@ class XpEntityCard extends StatelessWidget {
                         style: const TextStyle(fontWeight: FontWeight.w600),
                         child: title,
                       ),
-                      if (subtitle != null) ...[const SizedBox(height: 4), subtitle!],
+                      if (subtitle != null) ...[
+                        const SizedBox(height: 4),
+                        subtitle!,
+                      ],
                     ],
                   ),
                 ),
@@ -267,7 +282,11 @@ class XpStatusChip extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

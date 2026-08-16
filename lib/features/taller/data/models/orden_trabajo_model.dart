@@ -11,15 +11,19 @@ class OrdenTrabajoModel {
       estado: estadoFromString(json['estado'] as String? ?? 'pendiente'),
       fallaReportada: json['falla_reportada'] as String? ?? '',
       horasFacturables: (json['horas_facturables'] as num?)?.toDouble() ?? 0,
+      horasEstimadas: (json['horas_estimadas'] as num?)?.toDouble() ?? 2,
       saldoPendiente: (json['saldo_pendiente'] as num?)?.toDouble() ?? 0,
-      fechaCreacion: json['fecha_creacion'] != null 
-          ? DateTime.parse(json['fecha_creacion'] as String) 
+      fechaCreacion: json['fecha_creacion'] != null
+          ? DateTime.parse(json['fecha_creacion'] as String)
           : DateTime.now(),
       fechaInicioReparacion: json['fecha_inicio_reparacion'] != null
           ? DateTime.parse(json['fecha_inicio_reparacion'] as String)
           : null,
       fechaTerminado: json['fecha_terminado'] != null
           ? DateTime.parse(json['fecha_terminado'] as String)
+          : null,
+      fechaAprobacionPresupuesto: json['fecha_aprobacion_presupuesto'] != null
+          ? DateTime.parse(json['fecha_aprobacion_presupuesto'] as String)
           : null,
     );
   }

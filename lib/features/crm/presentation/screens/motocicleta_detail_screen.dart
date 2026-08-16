@@ -9,10 +9,12 @@ class MotocicletaDetailScreen extends ConsumerStatefulWidget {
   const MotocicletaDetailScreen({super.key, required this.vin});
 
   @override
-  ConsumerState<MotocicletaDetailScreen> createState() => _MotocicletaDetailScreenState();
+  ConsumerState<MotocicletaDetailScreen> createState() =>
+      _MotocicletaDetailScreenState();
 }
 
-class _MotocicletaDetailScreenState extends ConsumerState<MotocicletaDetailScreen> {
+class _MotocicletaDetailScreenState
+    extends ConsumerState<MotocicletaDetailScreen> {
   final _placaController = TextEditingController();
   final _marcaController = TextEditingController();
   final _modeloController = TextEditingController();
@@ -37,11 +39,15 @@ class _MotocicletaDetailScreenState extends ConsumerState<MotocicletaDetailScree
       _editando = false;
     });
     resultado.fold(
-      (f) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(f.mensaje))),
+      (f) => ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(f.mensaje))),
       (_) {
         ref.invalidate(motocicletasCrmProvider);
         ref.invalidate(motocicletaPorVinProvider(widget.vin));
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Motocicleta actualizada.')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Motocicleta actualizada.')),
+        );
       },
     );
   }
@@ -82,11 +88,23 @@ class _MotocicletaDetailScreenState extends ConsumerState<MotocicletaDetailScree
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  Text('VIN: ${moto.vin}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                  Text(
+                    'VIN: ${moto.vin}',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 12),
-                  TextField(controller: _placaController, decoration: const InputDecoration(labelText: 'Placa')),
-                  TextField(controller: _marcaController, decoration: const InputDecoration(labelText: 'Marca')),
-                  TextField(controller: _modeloController, decoration: const InputDecoration(labelText: 'Modelo')),
+                  TextField(
+                    controller: _placaController,
+                    decoration: const InputDecoration(labelText: 'Placa'),
+                  ),
+                  TextField(
+                    controller: _marcaController,
+                    decoration: const InputDecoration(labelText: 'Marca'),
+                  ),
+                  TextField(
+                    controller: _modeloController,
+                    decoration: const InputDecoration(labelText: 'Modelo'),
+                  ),
                   TextField(
                     controller: _anioController,
                     decoration: const InputDecoration(labelText: 'Año'),
@@ -97,7 +115,12 @@ class _MotocicletaDetailScreenState extends ConsumerState<MotocicletaDetailScree
                       value: _idCliente,
                       decoration: const InputDecoration(labelText: 'Cliente'),
                       items: clientes
-                          .map((c) => DropdownMenuItem(value: c.id, child: Text(c.nombreCompleto)))
+                          .map(
+                            (c) => DropdownMenuItem(
+                              value: c.id,
+                              child: Text(c.nombreCompleto),
+                            ),
+                          )
                           .toList(),
                       onChanged: (v) => setState(() => _idCliente = v),
                     ),
@@ -108,7 +131,11 @@ class _MotocicletaDetailScreenState extends ConsumerState<MotocicletaDetailScree
                   FilledButton(
                     onPressed: _procesando ? null : _guardar,
                     child: _procesando
-                        ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
                         : const Text('Guardar'),
                   ),
                 ],
@@ -120,9 +147,18 @@ class _MotocicletaDetailScreenState extends ConsumerState<MotocicletaDetailScree
             children: [
               ListTile(title: const Text('VIN'), subtitle: Text(moto.vin)),
               ListTile(title: const Text('Placa'), subtitle: Text(moto.placa)),
-              ListTile(title: const Text('Marca / Modelo'), subtitle: Text('${moto.marca} ${moto.modelo}')),
-              ListTile(title: const Text('Año'), subtitle: Text('${moto.anio}')),
-              ListTile(title: const Text('Cliente ID'), subtitle: Text(moto.idCliente)),
+              ListTile(
+                title: const Text('Marca / Modelo'),
+                subtitle: Text('${moto.marca} ${moto.modelo}'),
+              ),
+              ListTile(
+                title: const Text('Año'),
+                subtitle: Text('${moto.anio}'),
+              ),
+              ListTile(
+                title: const Text('Cliente ID'),
+                subtitle: Text(moto.idCliente),
+              ),
             ],
           );
         },

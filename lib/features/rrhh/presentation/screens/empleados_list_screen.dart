@@ -43,10 +43,7 @@ class EmpleadosListScreen extends ConsumerWidget {
           ],
         ),
         body: const TabBarView(
-          children: [
-            _ListaEmpleadosTab(),
-            _InvitacionesTab(),
-          ],
+          children: [_ListaEmpleadosTab(), _InvitacionesTab()],
         ),
       ),
     );
@@ -68,7 +65,8 @@ class _ListaEmpleadosTab extends ConsumerWidget {
         return ListView.builder(
           padding: const EdgeInsets.symmetric(vertical: 4),
           itemCount: empleados.length,
-          itemBuilder: (context, index) => _EmpleadoTile(empleado: empleados[index]),
+          itemBuilder: (context, index) =>
+              _EmpleadoTile(empleado: empleados[index]),
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -115,7 +113,9 @@ class _InvitacionesTab extends ConsumerWidget {
                 icon: const Icon(Icons.close),
                 tooltip: 'Cancelar invitación',
                 onPressed: () async {
-                  await ref.read(rrhhRepositoryProvider).cancelarInvitacion(inv.id);
+                  await ref
+                      .read(rrhhRepositoryProvider)
+                      .cancelarInvitacion(inv.id);
                   ref.invalidate(invitacionesPendientesProvider);
                 },
               ),
@@ -138,14 +138,18 @@ class _EmpleadoTile extends ConsumerWidget {
     return XpEntityCard(
       leading: CircleAvatar(
         backgroundColor: XpColors.selection,
-        child: Text(empleado.nombre[0], style: const TextStyle(color: Colors.white)),
+        child: Text(
+          empleado.nombre[0],
+          style: const TextStyle(color: Colors.white),
+        ),
       ),
       title: Text(empleado.nombre),
       subtitle: Text('${_rolLabel(empleado.rol)} · ${empleado.email}'),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (!empleado.activo) const XpStatusChip(label: 'Inactivo', color: Colors.grey),
+          if (!empleado.activo)
+            const XpStatusChip(label: 'Inactivo', color: Colors.grey),
           IconButton(
             icon: const Icon(Icons.edit_outlined),
             onPressed: () => _mostrarDialogoEdicion(context, ref, empleado),
@@ -173,7 +177,11 @@ class _EmpleadoTile extends ConsumerWidget {
     }
   }
 
-  void _mostrarDialogoEdicion(BuildContext context, WidgetRef ref, Empleado empleado) {
+  void _mostrarDialogoEdicion(
+    BuildContext context,
+    WidgetRef ref,
+    Empleado empleado,
+  ) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -187,7 +195,9 @@ class _EmpleadoTile extends ConsumerWidget {
               groupValue: empleado.rol,
               onChanged: (nuevoRol) async {
                 if (nuevoRol != null) {
-                  await ref.read(rrhhRepositoryProvider).actualizarRolEmpleado(empleado.id, nuevoRol.name);
+                  await ref
+                      .read(rrhhRepositoryProvider)
+                      .actualizarRolEmpleado(empleado.id, nuevoRol.name);
                   ref.invalidate(listaEmpleadosProvider);
                   if (context.mounted) Navigator.pop(context);
                 }
@@ -199,28 +209,39 @@ class _EmpleadoTile extends ConsumerWidget {
     );
   }
 
-  Future<void> _desactivar(BuildContext context, WidgetRef ref, Empleado empleado) async {
+  Future<void> _desactivar(
+    BuildContext context,
+    WidgetRef ref,
+    Empleado empleado,
+  ) async {
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Desactivar empleado'),
         content: Text('¿Desactivar a ${empleado.nombre}?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Desactivar')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Desactivar'),
+          ),
         ],
       ),
     );
     if (confirmar != true) return;
 
-    final resultado = await ref.read(rrhhRepositoryProvider).desactivarEmpleado(empleado.id);
-    resultado.fold(
-      (f) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(f.mensaje)));
-        }
-      },
-      (_) => ref.invalidate(listaEmpleadosProvider),
-    );
+    final resultado = await ref
+        .read(rrhhRepositoryProvider)
+        .desactivarEmpleado(empleado.id);
+    resultado.fold((f) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(f.mensaje)));
+      }
+    }, (_) => ref.invalidate(listaEmpleadosProvider));
   }
 }

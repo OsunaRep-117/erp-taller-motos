@@ -63,7 +63,9 @@ class CrmRepositoryImpl implements CrmRepository {
   Future<Either<Failure, Cliente>> actualizarCliente(Cliente cliente) async {
     try {
       if (!cliente.esValido) {
-        return const Left(ReglaDeNegocioFailure('Datos del cliente inválidos.'));
+        return const Left(
+          ReglaDeNegocioFailure('Datos del cliente inválidos.'),
+        );
       }
       return Right(await remote.actualizarCliente(cliente));
     } on PostgrestException catch (e) {
@@ -86,7 +88,9 @@ class CrmRepositoryImpl implements CrmRepository {
   }
 
   @override
-  Future<Either<Failure, Motocicleta>> obtenerMotocicletaPorVin(String vin) async {
+  Future<Either<Failure, Motocicleta>> obtenerMotocicletaPorVin(
+    String vin,
+  ) async {
     try {
       final moto = await remote.obtenerMotocicletaPorVin(vin);
       return Right(moto);
@@ -107,14 +111,16 @@ class CrmRepositoryImpl implements CrmRepository {
     required String idCliente,
   }) async {
     try {
-      return Right(await remote.actualizarMotocicleta(
-        vin: vin,
-        placa: placa,
-        marca: marca,
-        modelo: modelo,
-        anio: anio,
-        idCliente: idCliente,
-      ));
+      return Right(
+        await remote.actualizarMotocicleta(
+          vin: vin,
+          placa: placa,
+          marca: marca,
+          modelo: modelo,
+          anio: anio,
+          idCliente: idCliente,
+        ),
+      );
     } on PostgrestException catch (e) {
       return Left(ServerFailure(e.message));
     } catch (e) {
@@ -143,8 +149,38 @@ class CrmRepositoryImpl implements CrmRepository {
       return Right(nuevaMoto);
     } on PostgrestException catch (e) {
       if (e.code == '23505') {
-        return const Left(ReglaDeNegocioFailure('Ya existe una motocicleta registrada con ese VIN.'));
+        return const Left(
+          ReglaDeNegocioFailure(
+            'Ya existe una motocicleta registrada con ese VIN.',
+          ),
+        );
       }
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, double>> calcularExposicionCredito(
+    String idCliente,
+  ) async {
+    try {
+      final exposicion = await remote.calcularExposicionCredito(idCliente);
+      return Right(exposicion);
+    } on PostgrestException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> clienteFlotillaMoroso(String idCliente) async {
+    try {
+      final moroso = await remote.clienteFlotillaMoroso(idCliente);
+      return Right(moroso);
+    } on PostgrestException catch (e) {
       return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(ServerFailure(e.toString()));

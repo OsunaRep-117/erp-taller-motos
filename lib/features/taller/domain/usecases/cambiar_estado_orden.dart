@@ -11,6 +11,5 @@ class CambiarEstadoOrden {
   Future<Either<Failure, OrdenTrabajo>> call({
     required String idOrden,
     required EstadoOrdenTrabajo nuevoEstado,
-  }) =>
-      repository.cambiarEstado(idOrden: idOrden, nuevoEstado: nuevoEstado);
+  }) => repository.cambiarEstado(idOrden: idOrden, nuevoEstado: nuevoEstado);
 }

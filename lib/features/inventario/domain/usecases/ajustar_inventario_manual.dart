@@ -18,17 +18,27 @@ class AjustarInventarioManual {
   }) {
     if (!usuarioActual.esAdmin) {
       return Future.value(
-        const Left(ReglaDeNegocioFailure('Solo un administrador puede hacer ajustes de inventario.')),
+        const Left(
+          ReglaDeNegocioFailure(
+            'Solo un administrador puede hacer ajustes de inventario.',
+          ),
+        ),
       );
     }
     if (justificacion.trim().isEmpty) {
       return Future.value(
-        const Left(ReglaDeNegocioFailure('Se requiere una justificación para el ajuste.')),
+        const Left(
+          ReglaDeNegocioFailure(
+            'Se requiere una justificación para el ajuste.',
+          ),
+        ),
       );
     }
     if (cantidadAjuste == 0) {
       return Future.value(
-        const Left(ReglaDeNegocioFailure('La cantidad de ajuste no puede ser cero.')),
+        const Left(
+          ReglaDeNegocioFailure('La cantidad de ajuste no puede ser cero.'),
+        ),
       );
     }
 

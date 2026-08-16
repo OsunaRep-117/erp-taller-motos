@@ -23,6 +23,13 @@ class OrdenesListScreen extends ConsumerWidget {
 
     return AppScaffold(
       title: 'Órdenes de Trabajo',
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.view_kanban_outlined),
+          tooltip: 'Vista Kanban',
+          onPressed: () => context.go('/ordenes/kanban'),
+        ),
+      ],
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.go('/ordenes/crear'),
         icon: const Icon(Icons.add),
@@ -40,7 +47,8 @@ class OrdenesListScreen extends ConsumerWidget {
                 return ListView.builder(
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   itemCount: ordenes.length,
-                  itemBuilder: (context, index) => OrdenCard(orden: ordenes[index]),
+                  itemBuilder: (context, index) =>
+                      OrdenCard(orden: ordenes[index]),
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
@@ -59,9 +67,11 @@ class OrdenesListScreen extends ConsumerWidget {
 
     final otActivas = ordenesAsync.maybeWhen(
       data: (ordenes) => ordenes
-          .where((o) =>
-              o.estado != EstadoOrdenTrabajo.entregado &&
-              o.estado != EstadoOrdenTrabajo.cancelada)
+          .where(
+            (o) =>
+                o.estado != EstadoOrdenTrabajo.entregado &&
+                o.estado != EstadoOrdenTrabajo.cancelada,
+          )
           .length
           .toString(),
       orElse: () => '...',
@@ -93,7 +103,11 @@ class OrdenesListScreen extends ConsumerWidget {
               accent: Colors.orange.shade800,
             ),
             const SizedBox(width: 8),
-            XpKpiCard(label: 'OT activas', value: otActivas, accent: XpColors.selection),
+            XpKpiCard(
+              label: 'OT activas',
+              value: otActivas,
+              accent: XpColors.selection,
+            ),
           ],
         ),
       ),

@@ -14,12 +14,18 @@ class RegistrarPago {
     required MetodoPago metodoPago,
   }) {
     if (monto <= 0) {
-      return Future.value(const Left(ReglaDeNegocioFailure('El monto debe ser mayor a 0.')));
+      return Future.value(
+        const Left(ReglaDeNegocioFailure('El monto debe ser mayor a 0.')),
+      );
     }
     // La validación de "no exceder el saldo pendiente" (Sección 6.9)
     // ocurre en la RPC registrar_pago, porque requiere el saldo actual
     // desde la base de datos, no un valor que el cliente pudiera tener
     // desactualizado.
-    return repository.registrarPago(idOrden: idOrden, monto: monto, metodoPago: metodoPago);
+    return repository.registrarPago(
+      idOrden: idOrden,
+      monto: monto,
+      metodoPago: metodoPago,
+    );
   }
 }

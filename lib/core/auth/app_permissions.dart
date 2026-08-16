@@ -31,15 +31,21 @@ class AppPermissions {
       return rol != RolEmpleado.mecanico;
     }
 
+    if (ruta.startsWith('/citas')) {
+      return rol != RolEmpleado.mecanico;
+    }
+
     return true;
   }
 
   static bool puedeVerCostos(RolEmpleado rol) =>
       rol == RolEmpleado.admin || rol == RolEmpleado.supervisor;
 
-  static bool puedeAjustarInventario(RolEmpleado rol) => rol == RolEmpleado.admin;
+  static bool puedeAjustarInventario(RolEmpleado rol) =>
+      rol == RolEmpleado.admin;
 
-  static bool puedeGestionarPersonal(RolEmpleado rol) => rol == RolEmpleado.admin;
+  static bool puedeGestionarPersonal(RolEmpleado rol) =>
+      rol == RolEmpleado.admin;
 
   static bool puedeVerFinanzas(RolEmpleado rol) =>
       rol == RolEmpleado.admin || rol == RolEmpleado.supervisor;
@@ -56,6 +62,7 @@ class AppPermissions {
     ];
 
     if (rol != RolEmpleado.mecanico) {
+      rutas.add('/citas');
       rutas.add('/pos');
     }
 

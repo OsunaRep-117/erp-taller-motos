@@ -55,8 +55,38 @@ class InventarioRepositoryImpl implements InventarioRepository {
       return Right(data);
     } on PostgrestException catch (e) {
       if (e.code == '23505') {
-        return const Left(ReglaDeNegocioFailure('Ya existe un producto con este SKU.'));
+        return const Left(
+          ReglaDeNegocioFailure('Ya existe un producto con este SKU.'),
+        );
       }
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Map<String, dynamic>>>> listarReservasPorOrden(
+    String idOrden,
+  ) async {
+    try {
+      final data = await remote.listarReservasPorOrden(idOrden);
+      return Right(data);
+    } on PostgrestException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Map<String, dynamic>>>> listarConsumosPorOrden(
+    String idOrden,
+  ) async {
+    try {
+      final data = await remote.listarConsumosPorOrden(idOrden);
+      return Right(data);
+    } on PostgrestException catch (e) {
       return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -80,6 +110,30 @@ class InventarioRepositoryImpl implements InventarioRepository {
       return const Right(null);
     } on PostgrestException catch (e) {
       return Left(ReglaDeNegocioFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> registrarConsumoParaOrden({
+    required String idOrden,
+    required String sku,
+    required int cantidad,
+    required double precioUnitario,
+    String? nombre,
+  }) async {
+    try {
+      await remote.registrarConsumoParaOrden(
+        idOrden: idOrden,
+        sku: sku,
+        cantidad: cantidad,
+        precioUnitario: precioUnitario,
+        nombre: nombre,
+      );
+      return const Right(null);
+    } on PostgrestException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

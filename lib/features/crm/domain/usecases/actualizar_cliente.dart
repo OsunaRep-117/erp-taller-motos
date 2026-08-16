@@ -8,5 +8,6 @@ class ActualizarCliente {
   final CrmRepository repository;
   const ActualizarCliente(this.repository);
 
-  Future<Either<Failure, Cliente>> call(Cliente cliente) => repository.actualizarCliente(cliente);
+  Future<Either<Failure, Cliente>> call(Cliente cliente) =>
+      repository.actualizarCliente(cliente);
 }

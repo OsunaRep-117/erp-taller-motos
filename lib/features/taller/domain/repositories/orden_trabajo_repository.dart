@@ -3,6 +3,7 @@ import 'package:dartz/dartz.dart';
 import '../../../../core/errors/failures.dart';
 import '../entities/estado_historial.dart';
 import '../entities/orden_trabajo.dart';
+import '../entities/reserva_refaccion_ot.dart';
 
 abstract class OrdenTrabajoRepository {
   Future<Either<Failure, List<OrdenTrabajo>>> obtenerOrdenes();
@@ -41,7 +42,16 @@ abstract class OrdenTrabajoRepository {
     required EstadoOrdenTrabajo nuevoEstado,
   });
 
-  Future<Either<Failure, List<EstadoHistorial>>> obtenerHistorial(String idOrden);
+  Future<Either<Failure, OrdenTrabajo>> aprobarPresupuesto(String idOrden);
+
+  Future<Either<Failure, OrdenTrabajo>> reabrirOrden(String idOrden);
+
+  Future<Either<Failure, List<EstadoHistorial>>> obtenerHistorial(
+    String idOrden,
+  );
 
   Stream<List<OrdenTrabajo>> observarOrdenes();
+
+  Future<Either<Failure, List<ReservaRefaccionOt>>>
+  obtenerRefaccionesReservadas(String idOrden);
 }

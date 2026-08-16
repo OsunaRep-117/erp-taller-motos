@@ -19,13 +19,16 @@ class SubirEvidenciaOT {
   }) {
     if (bytes.length > _kMaxTamanioBytes) {
       return Future.value(
-        const Left(ReglaDeNegocioFailure('La foto no puede pesar más de 8 MB.')),
+        const Left(
+          ReglaDeNegocioFailure('La foto no puede pesar más de 8 MB.'),
+        ),
       );
     }
 
     final extensionesValidas = ['.jpg', '.jpeg', '.png', '.webp'];
-    final tieneExtensionValida = extensionesValidas
-        .any((ext) => nombreArchivo.toLowerCase().endsWith(ext));
+    final tieneExtensionValida = extensionesValidas.any(
+      (ext) => nombreArchivo.toLowerCase().endsWith(ext),
+    );
 
     if (!tieneExtensionValida) {
       return Future.value(

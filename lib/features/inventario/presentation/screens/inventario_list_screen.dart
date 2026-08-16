@@ -15,7 +15,8 @@ class InventarioListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final refaccionesAsync = ref.watch(refaccionesDisponiblesProvider);
     final user = ref.watch(authStateProvider).valueOrNull;
-    final puedeAjustar = user != null && AppPermissions.puedeAjustarInventario(user.rol);
+    final puedeAjustar =
+        user != null && AppPermissions.puedeAjustarInventario(user.rol);
 
     return AppScaffold(
       title: 'Inventario',
@@ -51,9 +52,14 @@ class InventarioListScreen extends ConsumerWidget {
               return XpEntityCard(
                 leading: const Icon(Icons.inventory_2_outlined),
                 title: Text(r.nombre),
-                subtitle: Text('SKU: ${r.sku} · Disponible: ${r.stockDisponible}'),
+                subtitle: Text(
+                  'SKU: ${r.sku} · Disponible: ${r.stockDisponible}',
+                ),
                 trailing: alerta
-                    ? const XpStatusChip(label: 'Reordenar', color: Color(0xFFE6A817))
+                    ? const XpStatusChip(
+                        label: 'Reordenar',
+                        color: Color(0xFFE6A817),
+                      )
                     : Text('\$${r.precioVenta.toStringAsFixed(2)}'),
                 onTap: () => context.go('/inventario/${r.sku}'),
               );

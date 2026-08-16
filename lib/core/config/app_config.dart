@@ -8,7 +8,11 @@ import 'env_loader.dart';
 /// Si tienes credenciales Supabase en `.env`, `flutter run` usa backend real
 /// sin necesidad de elegir un perfil especial en VS Code.
 class AppConfig {
-  static String _resolve(String fromDefine, String key, {String defaultValue = ''}) {
+  static String _resolve(
+    String fromDefine,
+    String key, {
+    String defaultValue = '',
+  }) {
     if (fromDefine.isNotEmpty) return fromDefine;
     return EnvLoader.get(key) ?? defaultValue;
   }
@@ -27,20 +31,18 @@ class AppConfig {
     return true;
   }
 
-  static String get supabaseUrl => _resolve(
-        const String.fromEnvironment('SUPABASE_URL'),
-        'SUPABASE_URL',
-      );
+  static String get supabaseUrl =>
+      _resolve(const String.fromEnvironment('SUPABASE_URL'), 'SUPABASE_URL');
 
   static String get supabaseAnonKey => _resolve(
-        const String.fromEnvironment('SUPABASE_ANON_KEY'),
-        'SUPABASE_ANON_KEY',
-      );
+    const String.fromEnvironment('SUPABASE_ANON_KEY'),
+    'SUPABASE_ANON_KEY',
+  );
 
   static String get googleWebClientId => _resolve(
-        const String.fromEnvironment('GOOGLE_WEB_CLIENT_ID'),
-        'GOOGLE_WEB_CLIENT_ID',
-      );
+    const String.fromEnvironment('GOOGLE_WEB_CLIENT_ID'),
+    'GOOGLE_WEB_CLIENT_ID',
+  );
 
   /// Deep link OAuth móvil (minúsculas, sin guiones bajos — requisito de Google).
   /// Agrégalo en Supabase → Authentication → URL Configuration → Redirect URLs.
@@ -49,6 +51,9 @@ class AppConfig {
   static const appName = 'ERP Taller de Motocicletas';
 
   static const evidenciasBucket = 'evidencias-ot';
+
+  /// PIN demo para devoluciones POS (§5.3).
+  static const posAutorizacionPin = '8765';
 
   /// Constantes de negocio (deben coincidir con las RPC en Supabase).
   static const tarifaManoObraPorHora = 350.0;

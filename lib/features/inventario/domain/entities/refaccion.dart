@@ -4,7 +4,7 @@ part 'refaccion.freezed.dart';
 part 'refaccion.g.dart';
 
 @freezed
-class Refaccion with _$Refaccion {
+abstract class Refaccion with _$Refaccion {
   const Refaccion._();
 
   const factory Refaccion({
@@ -18,7 +18,8 @@ class Refaccion with _$Refaccion {
     @Default(false) bool inactivo,
   }) = _Refaccion;
 
-  factory Refaccion.fromJson(Map<String, dynamic> json) => _$RefaccionFromJson(json);
+  factory Refaccion.fromJson(Map<String, dynamic> json) =>
+      _$RefaccionFromJson(json);
 
   int get stockDisponible => stockActual - stockReservado;
   bool get requiereReorden => stockActual <= stockMinimo;

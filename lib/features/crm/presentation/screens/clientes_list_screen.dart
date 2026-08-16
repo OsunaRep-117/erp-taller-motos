@@ -34,7 +34,12 @@ class ClientesListScreen extends ConsumerWidget {
                 leading: const Icon(Icons.person_outline),
                 title: Text(c.nombreCompleto),
                 subtitle: Text(c.telefono),
-                trailing: c.esFlotilla ? const XpStatusChip(label: 'Flotilla', color: Colors.indigo) : null,
+                trailing: c.esFlotilla
+                    ? const XpStatusChip(
+                        label: 'Flotilla',
+                        color: Colors.indigo,
+                      )
+                    : null,
                 onTap: () => context.go('/clientes/${c.id}'),
               );
             },

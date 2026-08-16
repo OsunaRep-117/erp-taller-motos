@@ -20,7 +20,9 @@ AuthRepository authRepository(AuthRepositoryRef ref) {
   if (AppConfig.useMockBackend) {
     return MockAuthRepositoryImpl(MockAuthDatasource(MockBackend.store));
   }
-  return AuthRepositoryImpl(AuthRemoteDatasource(ref.watch(supabaseClientProvider)));
+  return AuthRepositoryImpl(
+    AuthRemoteDatasource(ref.watch(supabaseClientProvider)),
+  );
 }
 
 @riverpod
@@ -29,7 +31,9 @@ IniciarSesion iniciarSesionUseCase(IniciarSesionUseCaseRef ref) {
 }
 
 @riverpod
-IniciarSesionConGoogle iniciarSesionConGoogleUseCase(IniciarSesionConGoogleUseCaseRef ref) {
+IniciarSesionConGoogle iniciarSesionConGoogleUseCase(
+  IniciarSesionConGoogleUseCaseRef ref,
+) {
   return IniciarSesionConGoogle(ref.watch(authRepositoryProvider));
 }
 

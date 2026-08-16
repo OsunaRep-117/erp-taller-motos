@@ -3,6 +3,7 @@ import 'package:postgrest/postgrest.dart';
 
 import '../../../../core/errors/failures.dart';
 import '../../domain/entities/factura.dart';
+import '../../domain/entities/gasto_operativo.dart';
 import '../../domain/entities/pago.dart';
 import '../../domain/repositories/finanzas_repository.dart';
 import '../datasources/finanzas_remote_datasource.dart';
@@ -20,7 +21,11 @@ class FinanzasRepositoryImpl implements FinanzasRepository {
     required MetodoPago metodoPago,
   }) async {
     try {
-      await remote.registrarPago(idOrden: idOrden, monto: monto, metodoPago: metodoPago.name);
+      await remote.registrarPago(
+        idOrden: idOrden,
+        monto: monto,
+        metodoPago: metodoPago.name,
+      );
       return const Right(null);
     } on PostgrestException catch (e) {
       // El RAISE EXCEPTION de "excede el saldo" cae aquí.
@@ -43,7 +48,9 @@ class FinanzasRepositoryImpl implements FinanzasRepository {
   }
 
   @override
-  Future<Either<Failure, List<Pago>>> listarPagosPorOrden(String idOrden) async {
+  Future<Either<Failure, List<Pago>>> listarPagosPorOrden(
+    String idOrden,
+  ) async {
     try {
       return Right(await remote.listarPagosPorOrden(idOrden));
     } on PostgrestException catch (e) {
@@ -81,10 +88,14 @@ class FinanzasRepositoryImpl implements FinanzasRepository {
     required String rfcReceptor,
   }) async {
     try {
-      return Right(await remote.emitirFactura(idOrden: idOrden, rfcReceptor: rfcReceptor));
+      return Right(
+        await remote.emitirFactura(idOrden: idOrden, rfcReceptor: rfcReceptor),
+      );
     } on PostgrestException catch (e) {
       if (e.code == '23505') {
-        return const Left(ReglaDeNegocioFailure('Esta orden ya tiene una factura emitida.'));
+        return const Left(
+          ReglaDeNegocioFailure('Esta orden ya tiene una factura emitida.'),
+        );
       }
       return Left(ServerFailure(e.message));
     } catch (e) {
@@ -99,7 +110,11 @@ class FinanzasRepositoryImpl implements FinanzasRepository {
     required double monto,
   }) async {
     try {
-      await remote.generarNotaCredito(idFactura: idFactura, motivo: motivo, monto: monto);
+      await remote.generarNotaCredito(
+        idFactura: idFactura,
+        motivo: motivo,
+        monto: monto,
+      );
       return const Right(null);
     } on PostgrestException catch (e) {
       return Left(ServerFailure(e.message));
@@ -123,6 +138,51 @@ class FinanzasRepositoryImpl implements FinanzasRepository {
   Future<Either<Failure, double>> obtenerValorInventario() async {
     try {
       return Right(await remote.obtenerValorInventario());
+    } on PostgrestException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, GastoOperativo>> registrarGastoOperativo({
+    required String concepto,
+    required double monto,
+    String? categoria,
+  }) async {
+    try {
+      return Right(
+        await remote.registrarGastoOperativo(
+          concepto: concepto,
+          monto: monto,
+          categoria: categoria,
+        ),
+      );
+    } on PostgrestException catch (e) {
+      return Left(ReglaDeNegocioFailure(e.message));
+    } catch (e) {
+      return Left(
+        ReglaDeNegocioFailure(e.toString().replaceFirst('Exception: ', '')),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<GastoOperativo>>> listarGastosOperativos() async {
+    try {
+      return Right(await remote.listarGastosOperativos());
+    } on PostgrestException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, double>> obtenerGastosOperativosMes() async {
+    try {
+      return Right(await remote.obtenerGastosOperativosMes());
     } on PostgrestException catch (e) {
       return Left(ServerFailure(e.message));
     } catch (e) {

@@ -9,7 +9,8 @@ class CrearProveedorScreen extends ConsumerStatefulWidget {
   const CrearProveedorScreen({super.key});
 
   @override
-  ConsumerState<CrearProveedorScreen> createState() => _CrearProveedorScreenState();
+  ConsumerState<CrearProveedorScreen> createState() =>
+      _CrearProveedorScreenState();
 }
 
 class _CrearProveedorScreenState extends ConsumerState<CrearProveedorScreen> {
@@ -20,15 +21,21 @@ class _CrearProveedorScreenState extends ConsumerState<CrearProveedorScreen> {
 
   Future<void> _crear() async {
     setState(() => _procesando = true);
-    final resultado = await ref.read(comprasRepositoryProvider).crearProveedor(
+    final resultado = await ref
+        .read(comprasRepositoryProvider)
+        .crearProveedor(
           nombre: _nombreController.text.trim(),
           contacto: _contactoController.text.trim(),
-          rfc: _rfcController.text.trim().isEmpty ? null : _rfcController.text.trim(),
+          rfc: _rfcController.text.trim().isEmpty
+              ? null
+              : _rfcController.text.trim(),
         );
     if (!mounted) return;
     setState(() => _procesando = false);
     resultado.fold(
-      (f) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(f.mensaje))),
+      (f) => ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(f.mensaje))),
       (_) {
         ref.invalidate(proveedoresDisponiblesProvider);
         context.pop();
@@ -59,7 +66,9 @@ class _CrearProveedorScreenState extends ConsumerState<CrearProveedorScreen> {
             const SizedBox(height: 16),
             TextField(
               controller: _contactoController,
-              decoration: const InputDecoration(labelText: 'Contacto (email o teléfono)'),
+              decoration: const InputDecoration(
+                labelText: 'Contacto (email o teléfono)',
+              ),
             ),
             const SizedBox(height: 16),
             TextField(
@@ -70,7 +79,11 @@ class _CrearProveedorScreenState extends ConsumerState<CrearProveedorScreen> {
             FilledButton(
               onPressed: _procesando ? null : _crear,
               child: _procesando
-                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
                   : const Text('Crear proveedor'),
             ),
           ],

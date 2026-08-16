@@ -10,10 +10,12 @@ class AjustarInventarioScreen extends ConsumerStatefulWidget {
   const AjustarInventarioScreen({super.key});
 
   @override
-  ConsumerState<AjustarInventarioScreen> createState() => _AjustarInventarioScreenState();
+  ConsumerState<AjustarInventarioScreen> createState() =>
+      _AjustarInventarioScreenState();
 }
 
-class _AjustarInventarioScreenState extends ConsumerState<AjustarInventarioScreen> {
+class _AjustarInventarioScreenState
+    extends ConsumerState<AjustarInventarioScreen> {
   String? _skuSeleccionado;
   final _cantidadController = TextEditingController();
   final _justificacionController = TextEditingController();
@@ -37,10 +39,14 @@ class _AjustarInventarioScreenState extends ConsumerState<AjustarInventarioScree
     setState(() => _procesando = false);
 
     resultado.fold(
-      (f) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(f.mensaje))),
+      (f) => ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(f.mensaje))),
       (_) {
         ref.invalidate(refaccionesDisponiblesProvider);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Ajuste registrado.')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Ajuste registrado.')));
         Navigator.of(context).pop();
       },
     );
@@ -69,7 +75,12 @@ class _AjustarInventarioScreenState extends ConsumerState<AjustarInventarioScree
                 value: _skuSeleccionado,
                 decoration: const InputDecoration(labelText: 'Refacción'),
                 items: refacciones
-                    .map((Refaccion r) => DropdownMenuItem(value: r.sku, child: Text('${r.sku} - ${r.nombre}')))
+                    .map(
+                      (Refaccion r) => DropdownMenuItem(
+                        value: r.sku,
+                        child: Text('${r.sku} - ${r.nombre}'),
+                      ),
+                    )
                     .toList(),
                 onChanged: (v) => setState(() => _skuSeleccionado = v),
               ),
@@ -85,14 +96,20 @@ class _AjustarInventarioScreenState extends ConsumerState<AjustarInventarioScree
               const SizedBox(height: 16),
               TextField(
                 controller: _justificacionController,
-                decoration: const InputDecoration(labelText: 'Justificación (obligatoria)'),
+                decoration: const InputDecoration(
+                  labelText: 'Justificación (obligatoria)',
+                ),
                 maxLines: 3,
               ),
               const Spacer(),
               FilledButton(
                 onPressed: _procesando ? null : _ajustar,
                 child: _procesando
-                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
                     : const Text('Registrar ajuste'),
               ),
             ],

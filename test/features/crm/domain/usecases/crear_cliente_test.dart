@@ -30,12 +30,14 @@ void main() {
         (failure) => expect(failure.mensaje, contains('RFC')),
         (_) => fail('Debió exigir RFC para flotilla'),
       );
-      verifyNever(() => repository.crearCliente(
-            nombreCompleto: any(named: 'nombreCompleto'),
-            telefono: any(named: 'telefono'),
-            rfc: any(named: 'rfc'),
-            esFlotilla: any(named: 'esFlotilla'),
-          ));
+      verifyNever(
+        () => repository.crearCliente(
+          nombreCompleto: any(named: 'nombreCompleto'),
+          telefono: any(named: 'telefono'),
+          rfc: any(named: 'rfc'),
+          esFlotilla: any(named: 'esFlotilla'),
+        ),
+      );
     });
 
     test('permite flotilla con RFC', () async {
@@ -46,12 +48,14 @@ void main() {
         rfc: 'PDB850101ABC',
         esFlotilla: true,
       );
-      when(() => repository.crearCliente(
-            nombreCompleto: 'Pizzería Don Beto',
-            telefono: '7710000000',
-            rfc: 'PDB850101ABC',
-            esFlotilla: true,
-          )).thenAnswer((_) async => const Right(clienteEsperado));
+      when(
+        () => repository.crearCliente(
+          nombreCompleto: 'Pizzería Don Beto',
+          telefono: '7710000000',
+          rfc: 'PDB850101ABC',
+          esFlotilla: true,
+        ),
+      ).thenAnswer((_) async => const Right(clienteEsperado));
 
       final resultado = await useCase(
         nombreCompleto: 'Pizzería Don Beto',

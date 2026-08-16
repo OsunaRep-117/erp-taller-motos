@@ -34,9 +34,18 @@ class OrdenCard extends StatelessWidget {
       onTap: () => context.go('/ordenes/${orden.id}'),
       title: Row(
         children: [
-          Text(orden.id),
-          const Spacer(),
-          XpStatusChip(label: orden.estado.name, color: _getStatusColor(orden.estado)),
+          Expanded(
+            child: Text(
+              '#${orden.id.substring(0, orden.id.length >= 8 ? 8 : orden.id.length)}',
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
+          const SizedBox(width: 4),
+          XpStatusChip(
+            label: orden.estado.name,
+            color: _getStatusColor(orden.estado),
+          ),
         ],
       ),
       subtitle: Column(

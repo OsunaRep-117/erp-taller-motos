@@ -1,5 +1,6 @@
 import '../../../features/finanzas/data/datasources/finanzas_datasource.dart';
 import '../../../features/finanzas/domain/entities/factura.dart';
+import '../../../features/finanzas/domain/entities/gasto_operativo.dart';
 import '../../../features/finanzas/domain/entities/pago.dart';
 import 'mock_data_store.dart';
 
@@ -11,12 +12,11 @@ class MockFinanzasDatasource implements FinanzasDataSource {
     required String idOrden,
     required double monto,
     required String metodoPago,
-  }) async =>
-      store.registrarPago(
-        idOrden: idOrden,
-        monto: monto,
-        metodoPago: MetodoPago.values.byName(metodoPago),
-      );
+  }) async => store.registrarPago(
+    idOrden: idOrden,
+    monto: monto,
+    metodoPago: MetodoPago.values.byName(metodoPago),
+  );
 
   Future<void> revertirPago(String idPago) async => store.revertirPago(idPago);
 
@@ -28,14 +28,14 @@ class MockFinanzasDatasource implements FinanzasDataSource {
 
   Future<List<Pago>> listarTodosLosPagos() async {
     store.ensureSeeded();
-    return List.from(store.pagos)..sort((a, b) => b.fechaPago.compareTo(a.fechaPago));
+    return List.from(store.pagos)
+      ..sort((a, b) => b.fechaPago.compareTo(a.fechaPago));
   }
 
   Future<Factura> emitirFactura({
     required String idOrden,
     required String rfcReceptor,
-  }) async =>
-      store.emitirFactura(idOrden: idOrden, rfcReceptor: rfcReceptor);
+  }) async => store.emitirFactura(idOrden: idOrden, rfcReceptor: rfcReceptor);
 
   Future<List<Factura>> listarFacturas() async {
     store.ensureSeeded();
@@ -46,8 +46,11 @@ class MockFinanzasDatasource implements FinanzasDataSource {
     required String idFactura,
     required String motivo,
     required double monto,
-  }) async =>
-      store.generarNotaCredito(idFactura: idFactura, motivo: motivo, monto: monto);
+  }) async => store.generarNotaCredito(
+    idFactura: idFactura,
+    motivo: motivo,
+    monto: monto,
+  );
 
   Future<double> obtenerIngresosMensuales() async {
     store.ensureSeeded();
@@ -57,5 +60,28 @@ class MockFinanzasDatasource implements FinanzasDataSource {
   Future<double> obtenerValorInventario() async {
     store.ensureSeeded();
     return store.obtenerValorInventario();
+  }
+
+  @override
+  Future<GastoOperativo> registrarGastoOperativo({
+    required String concepto,
+    required double monto,
+    String? categoria,
+  }) async => store.registrarGastoOperativo(
+    concepto: concepto,
+    monto: monto,
+    categoria: categoria,
+  );
+
+  @override
+  Future<List<GastoOperativo>> listarGastosOperativos() async {
+    store.ensureSeeded();
+    return List.from(store.gastosOperativos);
+  }
+
+  @override
+  Future<double> obtenerGastosOperativosMes() async {
+    store.ensureSeeded();
+    return store.obtenerGastosOperativosMes();
   }
 }

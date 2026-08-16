@@ -43,14 +43,22 @@ Future<List<Comision>> comisionesVisibles(ComisionesVisiblesRef ref) async {
 
 @riverpod
 Future<List<Empleado>> listaEmpleados(ListaEmpleadosRef ref) {
-  return ref.watch(rrhhRepositoryProvider).listarEmpleados().then(
+  return ref
+      .watch(rrhhRepositoryProvider)
+      .listarEmpleados()
+      .then(
         (result) => result.fold((f) => throw Exception(f.mensaje), (r) => r),
       );
 }
 
 @riverpod
-Future<List<EmpleadoInvitacion>> invitacionesPendientes(InvitacionesPendientesRef ref) {
-  return ref.watch(rrhhRepositoryProvider).listarInvitacionesPendientes().then(
+Future<List<EmpleadoInvitacion>> invitacionesPendientes(
+  InvitacionesPendientesRef ref,
+) {
+  return ref
+      .watch(rrhhRepositoryProvider)
+      .listarInvitacionesPendientes()
+      .then(
         (result) => result.fold((f) => throw Exception(f.mensaje), (r) => r),
       );
 }

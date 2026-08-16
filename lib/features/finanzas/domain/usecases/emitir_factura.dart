@@ -17,13 +17,24 @@ class EmitirFactura {
   }) {
     if (orden.saldoPendiente > 0) {
       return Future.value(
-        const Left(ReglaDeNegocioFailure('No se puede facturar una orden con saldo pendiente.')),
+        const Left(
+          ReglaDeNegocioFailure(
+            'No se puede facturar una orden con saldo pendiente.',
+          ),
+        ),
       );
     }
     if (rfcReceptor.trim().isEmpty) {
-      return Future.value(const Left(ReglaDeNegocioFailure('El RFC del receptor es obligatorio.')));
+      return Future.value(
+        const Left(
+          ReglaDeNegocioFailure('El RFC del receptor es obligatorio.'),
+        ),
+      );
     }
 
-    return repository.emitirFactura(idOrden: orden.id, rfcReceptor: rfcReceptor.trim());
+    return repository.emitirFactura(
+      idOrden: orden.id,
+      rfcReceptor: rfcReceptor.trim(),
+    );
   }
 }

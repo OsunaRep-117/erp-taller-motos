@@ -16,6 +16,10 @@ abstract class InventarioRepository {
 
   Future<Either<Failure, Refaccion>> obtenerPorSku(String sku);
 
+  Future<Either<Failure, List<Map<String, dynamic>>>> listarReservasPorOrden(
+    String idOrden,
+  );
+
   /// Regla Soft Allocation (Sección 5.2): reserva stock para una OT sin
   /// borrarlo físicamente. Falla si no hay stock disponible suficiente.
   Future<Either<Failure, void>> reservarParaOrden({
@@ -23,6 +27,15 @@ abstract class InventarioRepository {
     required String sku,
     required int cantidad,
     required double precioUnitarioVenta,
+  });
+
+  /// Registra el consumo real de refacciones que ya fueron utilizadas en la OT.
+  Future<Either<Failure, void>> registrarConsumoParaOrden({
+    required String idOrden,
+    required String sku,
+    required int cantidad,
+    required double precioUnitario,
+    String? nombre,
   });
 
   /// Al terminar la OT: descuenta stock_actual y libera stock_reservado

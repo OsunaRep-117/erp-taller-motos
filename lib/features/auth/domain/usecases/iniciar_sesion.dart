@@ -14,7 +14,9 @@ class IniciarSesion {
   }) {
     if (email.trim().isEmpty || password.isEmpty) {
       return Future.value(
-        const Left(ReglaDeNegocioFailure('Email y contraseña son obligatorios.')),
+        const Left(
+          ReglaDeNegocioFailure('Email y contraseña son obligatorios.'),
+        ),
       );
     }
     return repository.iniciarSesion(email: email.trim(), password: password);

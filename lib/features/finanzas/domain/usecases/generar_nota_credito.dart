@@ -16,7 +16,9 @@ class GenerarNotaCredito {
       return const Left(ReglaDeNegocioFailure('El motivo es obligatorio.'));
     }
     if (monto <= 0) {
-      return const Left(ReglaDeNegocioFailure('El monto debe ser mayor a cero.'));
+      return const Left(
+        ReglaDeNegocioFailure('El monto debe ser mayor a cero.'),
+      );
     }
     return repository.generarNotaCredito(
       idFactura: idFactura,

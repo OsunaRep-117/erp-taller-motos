@@ -45,7 +45,9 @@ class ComisionesListScreen extends ConsumerWidget {
                     return XpEntityCard(
                       leading: const Icon(Icons.payments_outlined),
                       title: Text('Orden ${c.idOrden}'),
-                      subtitle: Text('${c.porcentajeAplicado}% · ${c.fechaGenerada}'),
+                      subtitle: Text(
+                        '${c.porcentajeAplicado}% · ${c.fechaGenerada}',
+                      ),
                       trailing: Text('\$${c.monto.toStringAsFixed(2)}'),
                     );
                   },

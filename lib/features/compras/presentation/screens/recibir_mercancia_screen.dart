@@ -11,10 +11,12 @@ class RecibirMercanciaScreen extends ConsumerStatefulWidget {
   const RecibirMercanciaScreen({super.key});
 
   @override
-  ConsumerState<RecibirMercanciaScreen> createState() => _RecibirMercanciaScreenState();
+  ConsumerState<RecibirMercanciaScreen> createState() =>
+      _RecibirMercanciaScreenState();
 }
 
-class _RecibirMercanciaScreenState extends ConsumerState<RecibirMercanciaScreen> {
+class _RecibirMercanciaScreenState
+    extends ConsumerState<RecibirMercanciaScreen> {
   String? _skuSeleccionado;
   String? _proveedorSeleccionado;
   final _cantidadController = TextEditingController(text: '1');
@@ -34,27 +36,37 @@ class _RecibirMercanciaScreenState extends ConsumerState<RecibirMercanciaScreen>
 
     if (cantidad <= 0 || costo <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cantidad y costo deben ser mayores a cero.')),
+        const SnackBar(
+          content: Text('Cantidad y costo deben ser mayores a cero.'),
+        ),
       );
       return;
     }
 
     setState(() => _procesando = true);
 
-    final resultado = await ref.read(comprasRepositoryProvider).recibirMercancia(
-      sku: _skuSeleccionado!,
-      cantidad: cantidad,
-      costoUnitario: costo,
-      idProveedor: _proveedorSeleccionado!,
-    );
+    final resultado = await ref
+        .read(comprasRepositoryProvider)
+        .recibirMercancia(
+          sku: _skuSeleccionado!,
+          cantidad: cantidad,
+          costoUnitario: costo,
+          idProveedor: _proveedorSeleccionado!,
+        );
 
     if (!mounted) return;
     setState(() => _procesando = false);
 
     resultado.fold(
-      (f) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(f.mensaje))),
+      (f) => ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(f.mensaje))),
       (_) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mercancía recibida e inventario actualizado.')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Mercancía recibida e inventario actualizado.'),
+          ),
+        );
         ref.invalidate(refaccionesDisponiblesProvider);
         context.pop();
       },
@@ -82,53 +94,80 @@ class _RecibirMercanciaScreenState extends ConsumerState<RecibirMercanciaScreen>
             title: 'Entrada de inventario',
             maxWidth: 520,
             child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              refaccionesAsync.when(
-                data: (items) => DropdownButtonFormField<String>(
-                  value: _skuSeleccionado,
-                  decoration: const InputDecoration(labelText: 'Producto / Refacción'),
-                  items: items.map((r) => DropdownMenuItem(value: r.sku, child: Text(r.nombre))).toList(),
-                  onChanged: (v) => setState(() => _skuSeleccionado = v),
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                refaccionesAsync.when(
+                  data: (items) => DropdownButtonFormField<String>(
+                    value: _skuSeleccionado,
+                    decoration: const InputDecoration(
+                      labelText: 'Producto / Refacción',
+                    ),
+                    items: items
+                        .map(
+                          (r) => DropdownMenuItem(
+                            value: r.sku,
+                            child: Text(r.nombre),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (v) => setState(() => _skuSeleccionado = v),
+                  ),
+                  loading: () => const LinearProgressIndicator(),
+                  error: (e, _) => Text('Error: $e'),
                 ),
-                loading: () => const LinearProgressIndicator(),
-                error: (e, _) => Text('Error: $e'),
-              ),
-              const SizedBox(height: 16),
-              proveedoresAsync.when(
-                data: (items) => DropdownButtonFormField<String>(
-                  value: _proveedorSeleccionado,
-                  decoration: const InputDecoration(labelText: 'Proveedor'),
-                  items: items.map((p) => DropdownMenuItem(value: p.id, child: Text(p.nombre))).toList(),
-                  onChanged: (v) => setState(() => _proveedorSeleccionado = v),
+                const SizedBox(height: 16),
+                proveedoresAsync.when(
+                  data: (items) => DropdownButtonFormField<String>(
+                    value: _proveedorSeleccionado,
+                    decoration: const InputDecoration(labelText: 'Proveedor'),
+                    items: items
+                        .map(
+                          (p) => DropdownMenuItem(
+                            value: p.id,
+                            child: Text(p.nombre),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (v) =>
+                        setState(() => _proveedorSeleccionado = v),
+                  ),
+                  loading: () => const LinearProgressIndicator(),
+                  error: (e, _) => Text('Error: $e'),
                 ),
-                loading: () => const LinearProgressIndicator(),
-                error: (e, _) => Text('Error: $e'),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _cantidadController,
-                decoration: const InputDecoration(labelText: 'Cantidad recibida'),
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _costoController,
-                decoration: const InputDecoration(labelText: 'Costo unitario de compra'),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              ),
-              const SizedBox(height: 24),
-              FilledButton(
-                onPressed: _procesando ? null : _guardar,
-                child: _procesando
-                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                    : const Text('Registrar Entrada'),
-              ),
-            ],
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _cantidadController,
+                  decoration: const InputDecoration(
+                    labelText: 'Cantidad recibida',
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _costoController,
+                  decoration: const InputDecoration(
+                    labelText: 'Costo unitario de compra',
+                  ),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                FilledButton(
+                  onPressed: _procesando ? null : _guardar,
+                  child: _procesando
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Registrar Entrada'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    ),
     );
   }
 }

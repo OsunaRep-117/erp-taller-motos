@@ -95,4 +95,16 @@ class MockCrmDatasource implements CrmDataSource {
     store.motocicletas.add(moto);
     return moto;
   }
+
+  @override
+  Future<double> calcularExposicionCredito(String idCliente) async {
+    store.ensureSeeded();
+    return store.calcularExposicionCredito(idCliente);
+  }
+
+  @override
+  Future<bool> clienteFlotillaMoroso(String idCliente) async {
+    store.ensureSeeded();
+    return store.clienteFlotillaMoroso(idCliente);
+  }
 }

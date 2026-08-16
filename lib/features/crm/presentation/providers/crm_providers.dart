@@ -46,34 +46,48 @@ ActualizarCliente actualizarClienteUseCase(ActualizarClienteUseCaseRef ref) {
 }
 
 @riverpod
-ActualizarMotocicleta actualizarMotocicletaUseCase(ActualizarMotocicletaUseCaseRef ref) {
+ActualizarMotocicleta actualizarMotocicletaUseCase(
+  ActualizarMotocicletaUseCaseRef ref,
+) {
   return ActualizarMotocicleta(ref.watch(crmRepositoryProvider));
 }
 
 @riverpod
 Future<List<Cliente>> clientesDisponibles(ClientesDisponiblesRef ref) {
-  return ref.watch(crmRepositoryProvider).listarClientes().then(
+  return ref
+      .watch(crmRepositoryProvider)
+      .listarClientes()
+      .then(
         (result) => result.fold((f) => throw Exception(f.mensaje), (r) => r),
       );
 }
 
 @riverpod
 Future<List<Motocicleta>> motocicletasCrm(MotocicletasCrmRef ref) {
-  return ref.watch(crmRepositoryProvider).listarMotocicletas().then(
+  return ref
+      .watch(crmRepositoryProvider)
+      .listarMotocicletas()
+      .then(
         (result) => result.fold((f) => throw Exception(f.mensaje), (r) => r),
       );
 }
 
 @riverpod
 Future<Cliente> clientePorId(ClientePorIdRef ref, String id) {
-  return ref.watch(crmRepositoryProvider).obtenerClientePorId(id).then(
+  return ref
+      .watch(crmRepositoryProvider)
+      .obtenerClientePorId(id)
+      .then(
         (result) => result.fold((f) => throw Exception(f.mensaje), (r) => r),
       );
 }
 
 @riverpod
 Future<Motocicleta> motocicletaPorVin(MotocicletaPorVinRef ref, String vin) {
-  return ref.watch(crmRepositoryProvider).obtenerMotocicletaPorVin(vin).then(
+  return ref
+      .watch(crmRepositoryProvider)
+      .obtenerMotocicletaPorVin(vin)
+      .then(
         (result) => result.fold((f) => throw Exception(f.mensaje), (r) => r),
       );
 }

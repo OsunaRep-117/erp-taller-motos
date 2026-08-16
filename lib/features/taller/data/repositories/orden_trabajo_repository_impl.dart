@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 import '../../../../core/errors/failures.dart';
 import '../../domain/entities/estado_historial.dart';
 import '../../domain/entities/orden_trabajo.dart';
+import '../../domain/entities/reserva_refaccion_ot.dart';
 import '../../domain/repositories/orden_trabajo_repository.dart';
 import '../datasources/orden_trabajo_datasource.dart';
 import '../models/orden_trabajo_model.dart';
@@ -45,7 +46,7 @@ class OrdenTrabajoRepositoryImpl implements OrdenTrabajoRepository {
   }) async {
     try {
       final nuevaOrden = OrdenTrabajo(
-        id: 'ORD-${DateTime.now().year}-${const Uuid().v4().substring(0, 8)}',
+        id: const Uuid().v4(),
         idMoto: idMoto,
         estado: EstadoOrdenTrabajo.pendiente,
         fallaReportada: fallaReportada,
@@ -65,13 +66,19 @@ class OrdenTrabajoRepositoryImpl implements OrdenTrabajoRepository {
     required String idMecanico,
   }) async {
     try {
-      final ordenesEnProceso = await remote.contarOrdenesEnProcesoDeMecanico(idMecanico);
+      final ordenesEnProceso = await remote.contarOrdenesEnProcesoDeMecanico(
+        idMecanico,
+      );
       if (ordenesEnProceso >= _kMaxOtEnProcesoPorMecanico) {
-        return const Left(ReglaDeNegocioFailure(
-          'Este mecánico ya tiene 2 órdenes en reparación. Debe pausar una antes de asignarle otra.',
-        ));
+        return const Left(
+          ReglaDeNegocioFailure(
+            'Este mecánico ya tiene 2 órdenes en reparación. Debe pausar una antes de asignarle otra.',
+          ),
+        );
       }
-      return Right(await remote.asignarMecanico(idOrden: idOrden, idMecanico: idMecanico));
+      return Right(
+        await remote.asignarMecanico(idOrden: idOrden, idMecanico: idMecanico),
+      );
     } on PostgrestException catch (e) {
       return Left(ServerFailure(e.message));
     } catch (e) {
@@ -85,7 +92,9 @@ class OrdenTrabajoRepositoryImpl implements OrdenTrabajoRepository {
     required double horas,
   }) async {
     try {
-      return Right(await remote.actualizarHorasFacturables(idOrden: idOrden, horas: horas));
+      return Right(
+        await remote.actualizarHorasFacturables(idOrden: idOrden, horas: horas),
+      );
     } on PostgrestException catch (e) {
       return Left(ServerFailure(e.message));
     } catch (e) {
@@ -94,7 +103,9 @@ class OrdenTrabajoRepositoryImpl implements OrdenTrabajoRepository {
   }
 
   @override
-  Future<Either<Failure, OrdenTrabajo>> marcarComoTerminada(String idOrden) async {
+  Future<Either<Failure, OrdenTrabajo>> marcarComoTerminada(
+    String idOrden,
+  ) async {
     try {
       return Right(await remote.marcarComoTerminada(idOrden));
     } on PostgrestException catch (e) {
@@ -105,7 +116,9 @@ class OrdenTrabajoRepositoryImpl implements OrdenTrabajoRepository {
   }
 
   @override
-  Future<Either<Failure, OrdenTrabajo>> marcarComoEntregada(String idOrden) async {
+  Future<Either<Failure, OrdenTrabajo>> marcarComoEntregada(
+    String idOrden,
+  ) async {
     try {
       return Right(await remote.marcarComoEntregada(idOrden));
     } on PostgrestException catch (e) {
@@ -125,7 +138,9 @@ class OrdenTrabajoRepositoryImpl implements OrdenTrabajoRepository {
     } on PostgrestException catch (e) {
       return Left(ServerFailure(e.message));
     } catch (e) {
-      return Left(ReglaDeNegocioFailure(e.toString().replaceFirst('Exception: ', '')));
+      return Left(
+        ReglaDeNegocioFailure(e.toString().replaceFirst('Exception: ', '')),
+      );
     }
   }
 
@@ -135,11 +150,43 @@ class OrdenTrabajoRepositoryImpl implements OrdenTrabajoRepository {
     required EstadoOrdenTrabajo nuevoEstado,
   }) async {
     try {
-      return Right(await remote.cambiarEstado(idOrden: idOrden, nuevoEstado: nuevoEstado));
+      return Right(
+        await remote.cambiarEstado(idOrden: idOrden, nuevoEstado: nuevoEstado),
+      );
     } on PostgrestException catch (e) {
       return Left(ServerFailure(e.message));
     } catch (e) {
-      return Left(ReglaDeNegocioFailure(e.toString().replaceFirst('Exception: ', '')));
+      return Left(
+        ReglaDeNegocioFailure(e.toString().replaceFirst('Exception: ', '')),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, OrdenTrabajo>> aprobarPresupuesto(
+    String idOrden,
+  ) async {
+    try {
+      return Right(await remote.aprobarPresupuesto(idOrden));
+    } on PostgrestException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(
+        ReglaDeNegocioFailure(e.toString().replaceFirst('Exception: ', '')),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, OrdenTrabajo>> reabrirOrden(String idOrden) async {
+    try {
+      return Right(await remote.reabrirOrden(idOrden));
+    } on PostgrestException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(
+        ReglaDeNegocioFailure(e.toString().replaceFirst('Exception: ', '')),
+      );
     }
   }
 
@@ -147,19 +194,43 @@ class OrdenTrabajoRepositoryImpl implements OrdenTrabajoRepository {
   Stream<List<OrdenTrabajo>> observarOrdenes() => remote.observarOrdenes();
 
   @override
-  Future<Either<Failure, List<EstadoHistorial>>> obtenerHistorial(String idOrden) async {
+  Future<Either<Failure, List<EstadoHistorial>>> obtenerHistorial(
+    String idOrden,
+  ) async {
     try {
       final data = await remote.obtenerHistorial(idOrden);
-      return Right(data.map((json) => EstadoHistorial(
-            id: json['id'] as String,
-            idOrden: json['id_orden'] as String,
-            estadoAnterior: json['estado_anterior'] != null
-                ? OrdenTrabajoModel.estadoFromString(json['estado_anterior'] as String)
-                : EstadoOrdenTrabajo.pendiente,
-            estadoNuevo: OrdenTrabajoModel.estadoFromString(json['estado_nuevo'] as String),
-            fechaCambio: DateTime.parse(json['fecha_cambio'] as String),
-            idUsuario: json['id_usuario'] as String?,
-          )).toList());
+      return Right(
+        data
+            .map(
+              (json) => EstadoHistorial(
+                id: json['id'] as String,
+                idOrden: json['id_orden'] as String,
+                estadoAnterior: json['estado_anterior'] != null
+                    ? OrdenTrabajoModel.estadoFromString(
+                        json['estado_anterior'] as String,
+                      )
+                    : EstadoOrdenTrabajo.pendiente,
+                estadoNuevo: OrdenTrabajoModel.estadoFromString(
+                  json['estado_nuevo'] as String,
+                ),
+                fechaCambio: DateTime.parse(json['fecha_cambio'] as String),
+                idUsuario: json['id_usuario'] as String?,
+              ),
+            )
+            .toList(),
+      );
+    } on PostgrestException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<ReservaRefaccionOt>>>
+  obtenerRefaccionesReservadas(String idOrden) async {
+    try {
+      return Right(await remote.obtenerRefaccionesReservadas(idOrden));
     } on PostgrestException catch (e) {
       return Left(ServerFailure(e.message));
     } catch (e) {

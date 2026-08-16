@@ -1,4 +1,6 @@
-import 'env_loader_io.dart' if (dart.library.html) 'env_loader_web.dart' as platform;
+import 'env_loader_io.dart'
+    if (dart.library.html) 'env_loader_web.dart'
+    as platform;
 
 /// Carga variables desde `.env` (filesystem en desktop/mobile, asset en web).
 /// Las `--dart-define` siguen teniendo prioridad sobre el archivo.

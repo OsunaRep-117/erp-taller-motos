@@ -42,10 +42,10 @@ class ComprasRemoteDatasource implements ComprasDataSource {
     // Incrementar el stock_actual en la tabla refacciones
     // Nota: En un entorno real, esto se haría mediante un trigger en la DB
     // o una RPC para asegurar atomicidad. Aquí simulamos la llamada.
-    await client.rpc('incrementar_stock', params: {
-      'p_sku': sku,
-      'p_cantidad': cantidad,
-    });
+    await client.rpc(
+      'incrementar_stock',
+      params: {'p_sku': sku, 'p_cantidad': cantidad},
+    );
   }
 
   @override
@@ -55,5 +55,55 @@ class ComprasRemoteDatasource implements ComprasDataSource {
         .select()
         .order('fecha', ascending: false);
     return (data as List).cast<Map<String, dynamic>>();
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> listarOrdenesCompra() async {
+    final data = await client
+        .from('ordenes_compra')
+        .select()
+        .order('fecha_creacion', ascending: false);
+    return (data as List).cast<Map<String, dynamic>>();
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> detalleOrdenCompra(String idCompra) async {
+    final data = await client
+        .from('compra_detalle')
+        .select()
+        .eq('id_compra', idCompra);
+    return (data as List).cast<Map<String, dynamic>>();
+  }
+
+  @override
+  Future<Map<String, dynamic>> crearOrdenCompra({
+    required String idProveedor,
+    required List<Map<String, dynamic>> items,
+  }) async {
+    final id = await client.rpc(
+      'crear_orden_compra',
+      params: {'p_id_proveedor': idProveedor, 'p_items': items},
+    );
+    final data = await client
+        .from('ordenes_compra')
+        .select()
+        .eq('id', id)
+        .single();
+    return data;
+  }
+
+  @override
+  Future<Map<String, dynamic>> aprobarOrdenCompra(String idCompra) async {
+    await client.rpc('aprobar_orden_compra', params: {'p_id_compra': idCompra});
+    return await client
+        .from('ordenes_compra')
+        .select()
+        .eq('id', idCompra)
+        .single();
+  }
+
+  @override
+  Future<void> recibirOrdenCompra(String idCompra) async {
+    await client.rpc('recibir_orden_compra', params: {'p_id_compra': idCompra});
   }
 }

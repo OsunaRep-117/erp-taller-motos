@@ -10,7 +10,8 @@ class CrearEmpleadoScreen extends ConsumerStatefulWidget {
   const CrearEmpleadoScreen({super.key});
 
   @override
-  ConsumerState<CrearEmpleadoScreen> createState() => _CrearEmpleadoScreenState();
+  ConsumerState<CrearEmpleadoScreen> createState() =>
+      _CrearEmpleadoScreenState();
 }
 
 class _CrearEmpleadoScreenState extends ConsumerState<CrearEmpleadoScreen> {
@@ -21,7 +22,9 @@ class _CrearEmpleadoScreenState extends ConsumerState<CrearEmpleadoScreen> {
 
   Future<void> _crear() async {
     setState(() => _procesando = true);
-    final resultado = await ref.read(rrhhRepositoryProvider).crearEmpleado(
+    final resultado = await ref
+        .read(rrhhRepositoryProvider)
+        .crearEmpleado(
           nombre: _nombreController.text.trim(),
           email: _emailController.text.trim(),
           rol: _rol.name,
@@ -31,7 +34,9 @@ class _CrearEmpleadoScreenState extends ConsumerState<CrearEmpleadoScreen> {
     setState(() => _procesando = false);
 
     resultado.fold(
-      (f) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(f.mensaje))),
+      (f) => ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(f.mensaje))),
       (_) {
         ref.invalidate(listaEmpleadosProvider);
         context.pop();
@@ -61,7 +66,9 @@ class _CrearEmpleadoScreenState extends ConsumerState<CrearEmpleadoScreen> {
             const SizedBox(height: 16),
             TextField(
               controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Correo electrónico'),
+              decoration: const InputDecoration(
+                labelText: 'Correo electrónico',
+              ),
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<RolEmpleado>(
@@ -70,13 +77,18 @@ class _CrearEmpleadoScreenState extends ConsumerState<CrearEmpleadoScreen> {
               items: RolEmpleado.values
                   .map((r) => DropdownMenuItem(value: r, child: Text(r.name)))
                   .toList(),
-              onChanged: (v) => setState(() => _rol = v ?? RolEmpleado.mecanico),
+              onChanged: (v) =>
+                  setState(() => _rol = v ?? RolEmpleado.mecanico),
             ),
             const Spacer(),
             FilledButton(
               onPressed: _procesando ? null : _crear,
               child: _procesando
-                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
                   : const Text('Crear empleado'),
             ),
           ],
