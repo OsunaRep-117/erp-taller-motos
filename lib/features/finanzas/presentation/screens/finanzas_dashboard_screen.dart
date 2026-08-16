@@ -17,7 +17,7 @@ class FinanzasDashboardScreen extends ConsumerWidget {
     final valorInvAsync = ref.watch(valorInventarioProvider);
     final pagosAsync = ref.watch(todosLosPagosProvider);
     final facturasAsync = ref.watch(todasLasFacturasProvider);
-    final user = ref.watch(authStateProvider).valueOrNull;
+    final user = ref.watch(authStateProvider).value;
     final puedeGestionar =
         user?.esAdmin == true || user?.rol.name == 'supervisor';
 

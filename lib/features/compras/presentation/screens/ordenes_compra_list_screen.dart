@@ -74,7 +74,7 @@ class OrdenesCompraListScreen extends ConsumerWidget {
           if (ordenes.isEmpty) {
             return const XpEmptyState('No hay órdenes de compra.');
           }
-          final proveedores = proveedoresAsync.valueOrNull ?? [];
+          final proveedores = proveedoresAsync.value ?? [];
           return ListView.builder(
             padding: const EdgeInsets.symmetric(vertical: 4),
             itemCount: ordenes.length,

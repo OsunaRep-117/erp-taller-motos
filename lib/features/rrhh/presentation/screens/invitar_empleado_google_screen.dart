@@ -23,7 +23,7 @@ class _InvitarEmpleadoGoogleScreenState
   bool _procesando = false;
 
   Future<void> _invitar() async {
-    final admin = ref.read(authStateProvider).valueOrNull;
+    final admin = ref.read(authStateProvider).value;
     if (admin == null) return;
 
     setState(() => _procesando = true);

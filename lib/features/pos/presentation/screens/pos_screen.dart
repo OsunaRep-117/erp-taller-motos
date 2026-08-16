@@ -491,7 +491,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
 
   Widget _buildDevolucionesTab() {
     final ventasAsync = ref.watch(ventasPosHistorialProvider);
-    final user = ref.watch(authStateProvider).valueOrNull;
+    final user = ref.watch(authStateProvider).value;
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -547,7 +547,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
   }
 
   Future<void> _procesarDevolucion() async {
-    final user = ref.read(authStateProvider).valueOrNull;
+    final user = ref.read(authStateProvider).value;
     setState(() => _procesando = true);
     final result = await ref.read(devolverVentaPosUseCaseProvider)(
       idVenta: _ventaDevolucionId!,

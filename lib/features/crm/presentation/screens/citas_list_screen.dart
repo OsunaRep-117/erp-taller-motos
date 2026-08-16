@@ -174,7 +174,7 @@ class CitasListScreen extends ConsumerWidget {
           if (citas.isEmpty) {
             return const XpEmptyState('No hay citas agendadas.');
           }
-          final clientes = clientesAsync.valueOrNull ?? [];
+          final clientes = clientesAsync.value ?? [];
           return ListView.builder(
             padding: const EdgeInsets.symmetric(vertical: 4),
             itemCount: citas.length,

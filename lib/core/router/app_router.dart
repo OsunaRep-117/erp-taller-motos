@@ -184,7 +184,7 @@ GoRouter appRouter(AppRouterRef ref) {
     ],
     redirect: (context, state) {
       final authAsync = ref.read(authStateProvider);
-      final usuario = authAsync.valueOrNull;
+      final usuario = authAsync.value;
       final haySesion = usuario != null;
       final ruta = state.matchedLocation;
       final vaAlLogin = ruta == '/login';

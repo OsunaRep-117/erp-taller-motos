@@ -19,7 +19,7 @@ class OrdenesListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ordenesAsync = ref.watch(ordenesTrabajoStreamProvider);
     final userAsync = ref.watch(authStateProvider);
-    final esAdmin = userAsync.valueOrNull?.rol == RolEmpleado.admin;
+    final esAdmin = userAsync.value?.rol == RolEmpleado.admin;
 
     return AppScaffold(
       title: 'Órdenes de Trabajo',

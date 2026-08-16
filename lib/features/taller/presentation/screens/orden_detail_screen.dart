@@ -292,7 +292,7 @@ class _OrdenDetailScreenState extends ConsumerState<OrdenDetailScreen> {
   }
 
   Future<void> _aprobarExtension(String idExtension) async {
-    final user = ref.read(authStateProvider).valueOrNull;
+    final user = ref.read(authStateProvider).value;
     if (user == null) return;
     setState(() => _procesando = true);
     final result = await ref.read(aprobarExtensionCotizacionUseCaseProvider)(
@@ -315,7 +315,7 @@ class _OrdenDetailScreenState extends ConsumerState<OrdenDetailScreen> {
   }
 
   Future<void> _reabrirOrden() async {
-    final user = ref.read(authStateProvider).valueOrNull;
+    final user = ref.read(authStateProvider).value;
     if (user == null) return;
     setState(() => _procesando = true);
     final resultado = await ref.read(reabrirOrdenUseCaseProvider)(
@@ -338,7 +338,7 @@ class _OrdenDetailScreenState extends ConsumerState<OrdenDetailScreen> {
   }
 
   Future<void> _terminarOrden() async {
-    final user = ref.read(authStateProvider).valueOrNull;
+    final user = ref.read(authStateProvider).value;
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -353,7 +353,7 @@ class _OrdenDetailScreenState extends ConsumerState<OrdenDetailScreen> {
       builder: (ctx) => AlertDialog(
         title: const Text('Finalizar trabajo'),
         content: Text(
-          'Se cerrará la orden con un saldo estimado de \$${(ref.read(ordenPorIdProvider(widget.idOrden)).valueOrNull?.totalTrabajo ?? 0).toStringAsFixed(2)}. '
+          'Se cerrará la orden con un saldo estimado de \$${(ref.read(ordenPorIdProvider(widget.idOrden)).value?.totalTrabajo ?? 0).toStringAsFixed(2)}. '
           '¿Deseas continuar?',
         ),
         actions: [
@@ -657,9 +657,9 @@ class _OrdenDetailScreenState extends ConsumerState<OrdenDetailScreen> {
 
     final puedeEditar =
         !orden.esInmutable && orden.estado != EstadoOrdenTrabajo.cancelada;
-    final esMecanicoAsignado = userAsync.valueOrNull?.id == orden.idMecanico;
-    final esAdmin = userAsync.valueOrNull?.esAdmin ?? false;
-    final esSupervisor = userAsync.valueOrNull?.rol == RolEmpleado.supervisor;
+    final esMecanicoAsignado = userAsync.value?.id == orden.idMecanico;
+    final esAdmin = userAsync.value?.esAdmin ?? false;
+    final esSupervisor = userAsync.value?.rol == RolEmpleado.supervisor;
     final puedeAprobarExtension = esAdmin || esSupervisor;
 
     return SingleChildScrollView(

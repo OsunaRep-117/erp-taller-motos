@@ -14,7 +14,7 @@ class InventarioListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final refaccionesAsync = ref.watch(refaccionesDisponiblesProvider);
-    final user = ref.watch(authStateProvider).valueOrNull;
+    final user = ref.watch(authStateProvider).value;
     final puedeAjustar =
         user != null && AppPermissions.puedeAjustarInventario(user.rol);
 

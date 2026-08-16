@@ -14,7 +14,7 @@ class ComisionesListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final comisionesAsync = ref.watch(comisionesVisiblesProvider);
     final usuarioAsync = ref.watch(authStateProvider);
-    final esAdmin = usuarioAsync.valueOrNull?.esAdmin ?? false;
+    final esAdmin = usuarioAsync.value?.esAdmin ?? false;
 
     return AppScaffold(
       title: esAdmin ? 'Comisiones (todos)' : 'Mis comisiones',

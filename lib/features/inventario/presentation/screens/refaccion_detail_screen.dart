@@ -16,7 +16,7 @@ class RefaccionDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final refaccionAsync = ref.watch(refaccionPorSkuProvider(sku));
-    final user = ref.watch(authStateProvider).valueOrNull;
+    final user = ref.watch(authStateProvider).value;
     final puedeVerCostos =
         user != null && AppPermissions.puedeVerCostos(user.rol);
 

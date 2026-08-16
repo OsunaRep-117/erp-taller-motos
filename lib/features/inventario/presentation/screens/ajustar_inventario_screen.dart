@@ -22,7 +22,7 @@ class _AjustarInventarioScreenState
   bool _procesando = false;
 
   Future<void> _ajustar() async {
-    final usuario = ref.read(authStateProvider).valueOrNull;
+    final usuario = ref.read(authStateProvider).value;
     if (usuario == null || _skuSeleccionado == null) return;
 
     setState(() => _procesando = true);

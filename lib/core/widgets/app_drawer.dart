@@ -14,7 +14,7 @@ class AppDrawer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentRoute = GoRouterState.of(context).matchedLocation;
     final userAsync = ref.watch(authStateProvider);
-    final user = userAsync.valueOrNull;
+    final user = userAsync.value;
 
     Widget tile({
       required IconData icon,

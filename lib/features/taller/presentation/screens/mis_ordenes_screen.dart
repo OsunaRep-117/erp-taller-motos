@@ -13,7 +13,7 @@ class MisOrdenesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(authStateProvider).valueOrNull;
+    final user = ref.watch(authStateProvider).value;
 
     if (user == null) {
       return const AppScaffold(
