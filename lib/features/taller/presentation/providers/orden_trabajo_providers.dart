@@ -33,7 +33,7 @@ import '../../../crm/presentation/providers/crm_providers.dart';
 part 'orden_trabajo_providers.g.dart';
 
 @riverpod
-OrdenTrabajoDataSource ordenTrabajoDataSource(OrdenTrabajoDataSourceRef ref) {
+OrdenTrabajoDataSource ordenTrabajoDataSource(Ref ref) {
   if (AppConfig.useMockBackend) {
     return MockOrdenTrabajoDatasource(MockBackend.store);
   }
@@ -41,13 +41,13 @@ OrdenTrabajoDataSource ordenTrabajoDataSource(OrdenTrabajoDataSourceRef ref) {
 }
 
 @riverpod
-OrdenTrabajoRepository ordenTrabajoRepository(OrdenTrabajoRepositoryRef ref) {
+OrdenTrabajoRepository ordenTrabajoRepository(Ref ref) {
   return OrdenTrabajoRepositoryImpl(ref.watch(ordenTrabajoDataSourceProvider));
 }
 
 @riverpod
 ExtensionCotizacionDataSource extensionCotizacionDataSource(
-  ExtensionCotizacionDataSourceRef ref,
+  Ref ref,
 ) {
   if (AppConfig.useMockBackend) {
     return MockExtensionCotizacionDatasource(MockBackend.store);
@@ -57,7 +57,7 @@ ExtensionCotizacionDataSource extensionCotizacionDataSource(
 
 @riverpod
 ExtensionCotizacionRepository extensionCotizacionRepository(
-  ExtensionCotizacionRepositoryRef ref,
+  Ref ref,
 ) {
   return ExtensionCotizacionRepositoryImpl(
     ref.watch(extensionCotizacionDataSourceProvider),
@@ -65,7 +65,7 @@ ExtensionCotizacionRepository extensionCotizacionRepository(
 }
 
 @riverpod
-CrearOrdenTrabajo crearOrdenTrabajoUseCase(CrearOrdenTrabajoUseCaseRef ref) {
+CrearOrdenTrabajo crearOrdenTrabajoUseCase(Ref ref) {
   return CrearOrdenTrabajo(
     ref.watch(ordenTrabajoRepositoryProvider),
     ref.watch(crmRepositoryProvider),
@@ -73,19 +73,19 @@ CrearOrdenTrabajo crearOrdenTrabajoUseCase(CrearOrdenTrabajoUseCaseRef ref) {
 }
 
 @riverpod
-AsignarMecanico asignarMecanicoUseCase(AsignarMecanicoUseCaseRef ref) {
+AsignarMecanico asignarMecanicoUseCase(Ref ref) {
   return AsignarMecanico(ref.watch(ordenTrabajoRepositoryProvider));
 }
 
 @riverpod
 ActualizarHorasFacturables actualizarHorasUseCase(
-  ActualizarHorasUseCaseRef ref,
+  Ref ref,
 ) {
   return ActualizarHorasFacturables(ref.watch(ordenTrabajoRepositoryProvider));
 }
 
 @riverpod
-EntregarOrden entregarOrdenUseCase(EntregarOrdenUseCaseRef ref) {
+EntregarOrden entregarOrdenUseCase(Ref ref) {
   return EntregarOrden(
     ref.watch(ordenTrabajoRepositoryProvider),
     ref.watch(crmRepositoryProvider),
@@ -93,23 +93,23 @@ EntregarOrden entregarOrdenUseCase(EntregarOrdenUseCaseRef ref) {
 }
 
 @riverpod
-TerminarOrden terminarOrdenUseCase(TerminarOrdenUseCaseRef ref) {
+TerminarOrden terminarOrdenUseCase(Ref ref) {
   return TerminarOrden(ref.watch(ordenTrabajoRepositoryProvider));
 }
 
 @riverpod
-AprobarPresupuesto aprobarPresupuestoUseCase(AprobarPresupuestoUseCaseRef ref) {
+AprobarPresupuesto aprobarPresupuestoUseCase(Ref ref) {
   return AprobarPresupuesto(ref.watch(ordenTrabajoRepositoryProvider));
 }
 
 @riverpod
-ReabrirOrden reabrirOrdenUseCase(ReabrirOrdenUseCaseRef ref) {
+ReabrirOrden reabrirOrdenUseCase(Ref ref) {
   return ReabrirOrden(ref.watch(ordenTrabajoRepositoryProvider));
 }
 
 @riverpod
 SolicitarExtensionCotizacion solicitarExtensionCotizacionUseCase(
-  SolicitarExtensionCotizacionUseCaseRef ref,
+  Ref ref,
 ) {
   return SolicitarExtensionCotizacion(
     ref.watch(extensionCotizacionRepositoryProvider),
@@ -118,7 +118,7 @@ SolicitarExtensionCotizacion solicitarExtensionCotizacionUseCase(
 
 @riverpod
 AprobarExtensionCotizacion aprobarExtensionCotizacionUseCase(
-  AprobarExtensionCotizacionUseCaseRef ref,
+  Ref ref,
 ) {
   return AprobarExtensionCotizacion(
     ref.watch(extensionCotizacionRepositoryProvider),
@@ -126,27 +126,28 @@ AprobarExtensionCotizacion aprobarExtensionCotizacionUseCase(
 }
 
 @riverpod
-CancelarOrden cancelarOrdenUseCase(CancelarOrdenUseCaseRef ref) {
+CancelarOrden cancelarOrdenUseCase(Ref ref) {
   return CancelarOrden(ref.watch(ordenTrabajoRepositoryProvider));
 }
 
 @riverpod
-CambiarEstadoOrden cambiarEstadoOrdenUseCase(CambiarEstadoOrdenUseCaseRef ref) {
+CambiarEstadoOrden cambiarEstadoOrdenUseCase(Ref ref) {
   return CambiarEstadoOrden(ref.watch(ordenTrabajoRepositoryProvider));
 }
 
 @riverpod
-Stream<List<OrdenTrabajo>> ordenesTrabajoStream(OrdenesTrabajoStreamRef ref) {
+Stream<List<OrdenTrabajo>> ordenesTrabajoStream(Ref ref) {
   return ref.watch(ordenTrabajoRepositoryProvider).observarOrdenes();
 }
 
 @riverpod
 Stream<List<OrdenTrabajo>> ordenesDelMecanico(
-  OrdenesDelMecanicoRef ref,
+  Ref ref,
   String idMecanico,
 ) {
   return ref
-      .watch(ordenesTrabajoStreamProvider)
+      .watch(ordenTrabajoRepositoryProvider)
+      .observarOrdenes()
       .map(
         (ordenes) => ordenes
             .where((orden) => orden.perteneceAMecanico(idMecanico))
@@ -155,7 +156,7 @@ Stream<List<OrdenTrabajo>> ordenesDelMecanico(
 }
 
 @riverpod
-Future<OrdenTrabajo> ordenPorId(OrdenPorIdRef ref, String id) {
+Future<OrdenTrabajo> ordenPorId(Ref ref, String id) {
   return ref
       .watch(ordenTrabajoRepositoryProvider)
       .obtenerOrdenPorId(id)
@@ -165,7 +166,7 @@ Future<OrdenTrabajo> ordenPorId(OrdenPorIdRef ref, String id) {
 }
 
 @riverpod
-Future<List<EstadoHistorial>> historialOrden(HistorialOrdenRef ref, String id) {
+Future<List<EstadoHistorial>> historialOrden(Ref ref, String id) {
   return ref
       .watch(ordenTrabajoRepositoryProvider)
       .obtenerHistorial(id)
@@ -176,7 +177,7 @@ Future<List<EstadoHistorial>> historialOrden(HistorialOrdenRef ref, String id) {
 
 @riverpod
 Future<List<ReservaRefaccionOt>> refaccionesReservadasPorOrden(
-  RefaccionesReservadasPorOrdenRef ref,
+  Ref ref,
   String idOrden,
 ) {
   return ref
@@ -189,7 +190,7 @@ Future<List<ReservaRefaccionOt>> refaccionesReservadasPorOrden(
 
 @riverpod
 Future<List<ExtensionCotizacion>> extensionesPorOrden(
-  ExtensionesPorOrdenRef ref,
+  Ref ref,
   String idOrden,
 ) {
   return ref
@@ -202,7 +203,7 @@ Future<List<ExtensionCotizacion>> extensionesPorOrden(
 
 @riverpod
 Future<List<Map<String, dynamic>>> mecanicosDisponibles(
-  MecanicosDisponiblesRef ref,
+  Ref ref,
 ) async {
   if (AppConfig.useMockBackend) {
     MockBackend.store.ensureSeeded();

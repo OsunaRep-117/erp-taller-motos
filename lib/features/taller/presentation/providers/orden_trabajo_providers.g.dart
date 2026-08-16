@@ -55,7 +55,7 @@ final class OrdenTrabajoDataSourceProvider
 }
 
 String _$ordenTrabajoDataSourceHash() =>
-    r'd1fa8210ed5d9cd656171aaad2d709f1cf97fcbb';
+    r'b029987db10ba7eaa7678e31d5d70732fe0a798f';
 
 @ProviderFor(ordenTrabajoRepository)
 final ordenTrabajoRepositoryProvider = OrdenTrabajoRepositoryProvider._();
@@ -103,7 +103,7 @@ final class OrdenTrabajoRepositoryProvider
 }
 
 String _$ordenTrabajoRepositoryHash() =>
-    r'e9f2daa3e5bb60f51ae76d2ac379cb4959414812';
+    r'39118941f194c360cb87b9e070ab0983e720ae92';
 
 @ProviderFor(extensionCotizacionDataSource)
 final extensionCotizacionDataSourceProvider =
@@ -154,7 +154,7 @@ final class ExtensionCotizacionDataSourceProvider
 }
 
 String _$extensionCotizacionDataSourceHash() =>
-    r'4a9afc01a88d7ec86de3008f0f7e28099597c6ff';
+    r'08a5dbcf3bb47a35f104382b7230a1d8888775e0';
 
 @ProviderFor(extensionCotizacionRepository)
 final extensionCotizacionRepositoryProvider =
@@ -205,7 +205,7 @@ final class ExtensionCotizacionRepositoryProvider
 }
 
 String _$extensionCotizacionRepositoryHash() =>
-    r'b7e4c94ffd0e5b95ca2540185de99b8da4dd9c84';
+    r'0905348fb2e692dda24c68258ccd30e221f100c5';
 
 @ProviderFor(crearOrdenTrabajoUseCase)
 final crearOrdenTrabajoUseCaseProvider = CrearOrdenTrabajoUseCaseProvider._();
@@ -253,7 +253,7 @@ final class CrearOrdenTrabajoUseCaseProvider
 }
 
 String _$crearOrdenTrabajoUseCaseHash() =>
-    r'66b77c033db5cf00b91495abecb68f7b9f3bcba9';
+    r'74590d050e03d4b3aa32a0778d49644b14e74fb2';
 
 @ProviderFor(asignarMecanicoUseCase)
 final asignarMecanicoUseCaseProvider = AsignarMecanicoUseCaseProvider._();
@@ -296,7 +296,7 @@ final class AsignarMecanicoUseCaseProvider
 }
 
 String _$asignarMecanicoUseCaseHash() =>
-    r'9638ea8d85ac5c55fc8be312faf74c04a1f8b98d';
+    r'30485f59594d746386b781081194ec3032d1d0b6';
 
 @ProviderFor(actualizarHorasUseCase)
 final actualizarHorasUseCaseProvider = ActualizarHorasUseCaseProvider._();
@@ -344,7 +344,7 @@ final class ActualizarHorasUseCaseProvider
 }
 
 String _$actualizarHorasUseCaseHash() =>
-    r'6ad121e0eba8cb5c8a300c9ac41b058f5f3b9be2';
+    r'17bafff002eb28831bea113724d0a0d05b573b18';
 
 @ProviderFor(entregarOrdenUseCase)
 final entregarOrdenUseCaseProvider = EntregarOrdenUseCaseProvider._();
@@ -386,7 +386,7 @@ final class EntregarOrdenUseCaseProvider
 }
 
 String _$entregarOrdenUseCaseHash() =>
-    r'd3dd7cd0a988bea1308f3ce2a21eb5667890e764';
+    r'3d06e37bf9282755628b07061e159a259a091c9a';
 
 @ProviderFor(terminarOrdenUseCase)
 final terminarOrdenUseCaseProvider = TerminarOrdenUseCaseProvider._();
@@ -428,7 +428,7 @@ final class TerminarOrdenUseCaseProvider
 }
 
 String _$terminarOrdenUseCaseHash() =>
-    r'960e1cc5a158897b5265aed03eadfed2c45fafde';
+    r'3df0915440315127373f086238ff657fca3b6af8';
 
 @ProviderFor(aprobarPresupuestoUseCase)
 final aprobarPresupuestoUseCaseProvider = AprobarPresupuestoUseCaseProvider._();
@@ -476,7 +476,7 @@ final class AprobarPresupuestoUseCaseProvider
 }
 
 String _$aprobarPresupuestoUseCaseHash() =>
-    r'a69433eaac975c9b17373a94f0d16071045f2cf8';
+    r'127aa6ec50c4395c44f20da60032d0702ee8e767';
 
 @ProviderFor(reabrirOrdenUseCase)
 final reabrirOrdenUseCaseProvider = ReabrirOrdenUseCaseProvider._();
@@ -518,7 +518,7 @@ final class ReabrirOrdenUseCaseProvider
 }
 
 String _$reabrirOrdenUseCaseHash() =>
-    r'4db35e1edba66b70dd550f6413d82352b1afb260';
+    r'b556f5fe4f037154e22666ceec3eac2f5e7cc1ac';
 
 @ProviderFor(solicitarExtensionCotizacionUseCase)
 final solicitarExtensionCotizacionUseCaseProvider =
@@ -568,7 +568,7 @@ final class SolicitarExtensionCotizacionUseCaseProvider
 }
 
 String _$solicitarExtensionCotizacionUseCaseHash() =>
-    r'6ff0e9cf8e5ef3adcb8ecb6853c19f6eb047d388';
+    r'1b1cbf59e0a9b1d039e6bcd47d585dc606431a1c';
 
 @ProviderFor(aprobarExtensionCotizacionUseCase)
 final aprobarExtensionCotizacionUseCaseProvider =
@@ -618,7 +618,7 @@ final class AprobarExtensionCotizacionUseCaseProvider
 }
 
 String _$aprobarExtensionCotizacionUseCaseHash() =>
-    r'4001f8cc60a52f6c4e7a225ac5edf916c46b6533';
+    r'4bbfe8a3bac8c3d4e987e5b65a585c4569ae70c6';
 
 @ProviderFor(cancelarOrdenUseCase)
 final cancelarOrdenUseCaseProvider = CancelarOrdenUseCaseProvider._();
@@ -660,7 +660,7 @@ final class CancelarOrdenUseCaseProvider
 }
 
 String _$cancelarOrdenUseCaseHash() =>
-    r'3444e9f0cb5feb9db187155d8bb4369557303d24';
+    r'e368f1aa4f54ed4858764d4262020510ec52419c';
 
 @ProviderFor(cambiarEstadoOrdenUseCase)
 final cambiarEstadoOrdenUseCaseProvider = CambiarEstadoOrdenUseCaseProvider._();
@@ -708,7 +708,7 @@ final class CambiarEstadoOrdenUseCaseProvider
 }
 
 String _$cambiarEstadoOrdenUseCaseHash() =>
-    r'683fadae1de2430bfef1eb1b9a8a7387e6fb5d05';
+    r'ff2be21f31bb5b5a1d5cf49b339fca568e2095d8';
 
 @ProviderFor(ordenesTrabajoStream)
 final ordenesTrabajoStreamProvider = OrdenesTrabajoStreamProvider._();
@@ -750,7 +750,7 @@ final class OrdenesTrabajoStreamProvider
 }
 
 String _$ordenesTrabajoStreamHash() =>
-    r'5102480e82db6f5fc45372cbf450dd1f4a2b0faa';
+    r'79493e2e1b0fdd98f905dda3e383d5cfaf2ef7b9';
 
 @ProviderFor(ordenesDelMecanico)
 final ordenesDelMecanicoProvider = OrdenesDelMecanicoFamily._();
@@ -810,7 +810,7 @@ final class OrdenesDelMecanicoProvider
 }
 
 String _$ordenesDelMecanicoHash() =>
-    r'7302a30226ffc8f66203e487d9a85773cbf5b27c';
+    r'42bc11f7ec3a98ae85481707e59f5ed06267d69e';
 
 final class OrdenesDelMecanicoFamily extends $Family
     with $FunctionalFamilyOverride<Stream<List<OrdenTrabajo>>, String> {
@@ -885,7 +885,7 @@ final class OrdenPorIdProvider
   }
 }
 
-String _$ordenPorIdHash() => r'08493d9d282fa2a66b78723b4c43c195561c1f25';
+String _$ordenPorIdHash() => r'1e30239f740d15fe414e0947a57cefc383c8651d';
 
 final class OrdenPorIdFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<OrdenTrabajo>, String> {
@@ -962,7 +962,7 @@ final class HistorialOrdenProvider
   }
 }
 
-String _$historialOrdenHash() => r'30d491d058c35e6a3e477286e20d7d4b57d002b6';
+String _$historialOrdenHash() => r'380d3eea57f0047f1df6983dbea60a3df77b3c5c';
 
 final class HistorialOrdenFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<EstadoHistorial>>, String> {
@@ -1042,7 +1042,7 @@ final class RefaccionesReservadasPorOrdenProvider
 }
 
 String _$refaccionesReservadasPorOrdenHash() =>
-    r'10bf3e1f5a2a6c5848e8bcd10dabf1e4b24f417b';
+    r'7035bf01c7152a598d5449c6ed63666df56061ef';
 
 final class RefaccionesReservadasPorOrdenFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<ReservaRefaccionOt>>, String> {
@@ -1120,7 +1120,7 @@ final class ExtensionesPorOrdenProvider
 }
 
 String _$extensionesPorOrdenHash() =>
-    r'a46c51d5e5cd6f7b6ad8ee7dd4488061d4dc1b21';
+    r'2760725528eb81213ccb4189519b334cc23c70d1';
 
 final class ExtensionesPorOrdenFamily extends $Family
     with
@@ -1181,4 +1181,4 @@ final class MecanicosDisponiblesProvider
 }
 
 String _$mecanicosDisponiblesHash() =>
-    r'b791f7297a19786de5a82ec964a2ee350a0daa30';
+    r'96f125e87b7188193a813398f93cca26ced82020';

@@ -41,7 +41,7 @@ import '../auth/app_permissions.dart';
 part 'app_router.g.dart';
 
 @riverpod
-GoRouter appRouter(AppRouterRef ref) {
+GoRouter appRouter(Ref ref) {
   return GoRouter(
     initialLocation: '/ordenes',
     routes: [
@@ -201,7 +201,7 @@ GoRouter appRouter(AppRouterRef ref) {
       return null;
     },
     refreshListenable: GoRouterRefreshStream(
-      ref.watch(authStateProvider.stream),
+      ref.watch(authRepositoryProvider).observarEstadoAuth(),
     ),
   );
 }

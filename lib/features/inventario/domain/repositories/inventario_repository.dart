@@ -37,6 +37,9 @@ abstract class InventarioRepository {
     required double precioUnitario,
     String? nombre,
   });
+  Future<Either<Failure, List<Map<String, dynamic>>>> listarConsumosPorOrden(
+  String idOrden,
+  );
 
   /// Al terminar la OT: descuenta stock_actual y libera stock_reservado
   /// para las refacciones ya usadas en esa orden.

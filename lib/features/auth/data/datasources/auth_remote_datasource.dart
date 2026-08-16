@@ -6,7 +6,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/config/app_config.dart';
 import '../../domain/entities/usuario.dart';
-
 /// Se lanza en web cuando el navegador va a redirigir a Google (no es fallo).
 class GoogleRedirectPending implements Exception {
   const GoogleRedirectPending();
@@ -17,6 +16,7 @@ class AuthRemoteDatasource {
   const AuthRemoteDatasource(this.client);
 
   static String? ultimoErrorAcceso;
+  static bool _googleSignInInitialized = false;
 
   Future<Usuario> iniciarSesion({
     required String email,
@@ -45,65 +45,54 @@ class AuthRemoteDatasource {
   }
 
   /// Android/iOS: selector nativo de cuenta Google (sin abrir navegador).
+  /// Android/iOS: selector nativo de cuenta Google (sin abrir navegador).
   Future<Usuario> _iniciarSesionConGoogleNativo() async {
     if (AppConfig.googleWebClientId.isEmpty) {
       throw const AuthException(
         'Falta GOOGLE_WEB_CLIENT_ID en .env (serverClientId para Google en móvil).',
       );
     }
-
     await client.auth.signOut(scope: SignOutScope.local);
-
-    final googleSignIn = GoogleSignIn(
-      serverClientId: AppConfig.googleWebClientId,
-      scopes: const ['email', 'openid'],
-    );
-
+    final googleSignIn = GoogleSignIn.instance;
     try {
-      await googleSignIn.signOut();
-      try {
-        await googleSignIn.disconnect();
-      } catch (_) {}
-
-      final googleUser = await googleSignIn.signIn();
-      if (googleUser == null) {
-        throw const AuthException('Inicio de sesión con Google cancelado.');
+      if (!_googleSignInInitialized) {
+        await googleSignIn.initialize(
+          serverClientId: AppConfig.googleWebClientId,
+        );
+        _googleSignInInitialized = true;
       }
-
-      final googleAuth = await googleUser.authentication;
-      final idToken = googleAuth.idToken;
+      final googleUser = await googleSignIn.authenticate();
+      final idToken = googleUser.authentication.idToken;
       if (idToken == null) {
         throw const AuthException(
           'No se pudo obtener el ID Token de Google. '
           'Verifica GOOGLE_WEB_CLIENT_ID y la credencial Android (SHA-1) en Google Cloud.',
         );
       }
-
       final response = await client.auth.signInWithIdToken(
         provider: OAuthProvider.google,
         idToken: idToken,
-        accessToken: googleAuth.accessToken,
       );
-
       final authUser = response.user;
       if (authUser == null) {
         throw const AuthException('No se pudo autenticar con Google.');
       }
-
       return _resolverAccesoEmpleado(
         authUser,
         nombreGoogle:
             googleUser.displayName ?? authUser.email?.split('@').first,
       );
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled) {
+        throw const AuthException('Inicio de sesión con Google cancelado.');
+      }
+      throw AuthException('Error de Google (${e.code}): ${e.description}');
     } on PlatformException catch (e) {
       if (e.code == '10') {
         throw const AuthException(
           'Error 10: en Google Cloud crea credencial OAuth tipo Android con '
           'package com.upfim.erp_flutter y el SHA-1 de tu keystore debug.',
         );
-      }
-      if (e.code == 'popup_closed' || e.code == 'sign_in_canceled') {
-        throw const AuthException('Inicio de sesión con Google cancelado.');
       }
       throw AuthException('Error de Google (${e.code}): ${e.message}');
     }
@@ -141,9 +130,7 @@ class AuthRemoteDatasource {
     ultimoErrorAcceso = null;
     if (!kIsWeb && AppConfig.googleWebClientId.isNotEmpty) {
       try {
-        await GoogleSignIn(
-          serverClientId: AppConfig.googleWebClientId,
-        ).signOut();
+        await GoogleSignIn.instance.signOut();
       } catch (_) {}
     }
     await client.auth.signOut(scope: SignOutScope.global);

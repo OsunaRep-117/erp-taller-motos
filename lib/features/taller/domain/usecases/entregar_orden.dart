@@ -14,24 +14,59 @@ class EntregarOrden {
   Future<Either<Failure, OrdenTrabajo>> call(String idOrden) async {
     final ordenResult = await repository.obtenerOrdenPorId(idOrden);
 
-    return ordenResult.fold((f) => Left(f), (orden) async {
-      if (orden.estado != EstadoOrdenTrabajo.pagado) {
-        return const Left(
-          ReglaDeNegocioFailure(
-            'La orden debe estar pagada antes del entrega.',
-          ),
-        );
-      }
+    return ordenResult.fold<Future<Either<Failure, OrdenTrabajo>>>(
+      (f) async => Left(f),
+      (orden) async {
+        if (orden.saldoPendiente <= 0) {
+          return repository.marcarComoEntregada(idOrden);
+        }
 
-      if (orden.saldoPendiente > 0) {
-        return const Left(
-          ReglaDeNegocioFailure(
-            'El saldo pendiente debe quedar en cero para entregar el vehículo.',
-          ),
+        final motoResult = await crmRepository.obtenerMotocicletaPorVin(
+          orden.idMoto,
         );
-      }
 
-      return repository.marcarComoEntregada(idOrden);
-    });
+        return motoResult.fold<Future<Either<Failure, OrdenTrabajo>>>(
+          (f) async => Left(f),
+          (moto) async {
+            final clienteResult = await crmRepository.obtenerClientePorId(
+              moto.idCliente,
+            );
+
+            return clienteResult.fold<Future<Either<Failure, OrdenTrabajo>>>(
+              (f) async => Left(f),
+              (cliente) async {
+                if (!cliente.esFlotilla) {
+                  return const Left(
+                    ReglaDeNegocioFailure(
+                      'Clientes particulares no pueden retirar vehículos con saldo pendiente.',
+                    ),
+                  );
+                }
+
+                final exposicionResult =
+                    await crmRepository.calcularExposicionCredito(
+                  cliente.id,
+                );
+
+                return exposicionResult
+                    .fold<Future<Either<Failure, OrdenTrabajo>>>(
+                  (f) async => Left(f),
+                  (exposicion) async {
+                    if (exposicion > cliente.limiteCredito) {
+                      return const Left(
+                        ReglaDeNegocioFailure(
+                          'La exposición de crédito del cliente supera su límite disponible.',
+                        ),
+                      );
+                    }
+                    return repository.marcarComoEntregada(idOrden);
+                  },
+                );
+              },
+            );
+          },
+        );
+      },
+    );
   }
 }
