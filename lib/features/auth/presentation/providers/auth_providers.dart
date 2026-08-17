@@ -12,11 +12,10 @@ import '../../domain/usecases/cerrar_sesion.dart';
 import '../../domain/usecases/iniciar_sesion.dart';
 import '../../domain/usecases/iniciar_sesion_con_google.dart';
 import '../../../../core/network/supabase_client_provider.dart';
-
 part 'auth_providers.g.dart';
 
-@riverpod
-AuthRepository authRepository(AuthRepositoryRef ref) {
+@Riverpod(keepAlive: true)
+AuthRepository authRepository(Ref ref) {
   if (AppConfig.useMockBackend) {
     return MockAuthRepositoryImpl(MockAuthDatasource(MockBackend.store));
   }
@@ -26,23 +25,23 @@ AuthRepository authRepository(AuthRepositoryRef ref) {
 }
 
 @riverpod
-IniciarSesion iniciarSesionUseCase(IniciarSesionUseCaseRef ref) {
+IniciarSesion iniciarSesionUseCase(Ref ref) {
   return IniciarSesion(ref.watch(authRepositoryProvider));
 }
 
 @riverpod
 IniciarSesionConGoogle iniciarSesionConGoogleUseCase(
-  IniciarSesionConGoogleUseCaseRef ref,
+  Ref ref,
 ) {
   return IniciarSesionConGoogle(ref.watch(authRepositoryProvider));
 }
 
 @riverpod
-CerrarSesion cerrarSesionUseCase(CerrarSesionUseCaseRef ref) {
+CerrarSesion cerrarSesionUseCase(Ref ref) {
   return CerrarSesion(ref.watch(authRepositoryProvider));
 }
 
-@riverpod
-Stream<Usuario?> authState(AuthStateRef ref) {
+@Riverpod(keepAlive: true)
+Stream<Usuario?> authState(Ref ref) {
   return ref.watch(authRepositoryProvider).observarEstadoAuth();
 }

@@ -43,7 +43,6 @@ void main() {
 
     await tester.tap(find.byIcon(Icons.menu));
     await tester.pumpAndSettle();
-
     expect(find.text('Finanzas'), findsOneWidget);
     expect(find.text('Compras'), findsOneWidget);
     expect(find.text('Gestión de Personal'), findsOneWidget);

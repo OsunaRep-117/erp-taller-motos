@@ -1,9 +1,8 @@
-import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
+import '../../features/auth/domain/entities/usuario.dart';
 import '../../features/auth/presentation/providers/auth_providers.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/compras/presentation/screens/crear_orden_compra_screen.dart';
@@ -200,21 +199,14 @@ GoRouter appRouter(Ref ref) {
 
       return null;
     },
-    refreshListenable: GoRouterRefreshStream(
-      ref.watch(authRepositoryProvider).observarEstadoAuth(),
-    ),
+    refreshListenable: GoRouterRefreshStream(ref, authStateProvider),
   );
 }
 
 class GoRouterRefreshStream extends ChangeNotifier {
-  late final StreamSubscription<dynamic> _subscription;
-  GoRouterRefreshStream(Stream<dynamic> stream) {
-    notifyListeners();
-    _subscription = stream.asBroadcastStream().listen((_) => notifyListeners());
-  }
-  @override
-  void dispose() {
-    _subscription.cancel();
-    super.dispose();
+  GoRouterRefreshStream(Ref ref, ProviderListenable<AsyncValue<Usuario?>> provider) {
+    ref.listen(provider, (previous, next) {
+      notifyListeners();
+    });
   }
 }

@@ -21,7 +21,7 @@ final class AuthRepositoryProvider
         argument: null,
         retry: null,
         name: r'authRepositoryProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -48,7 +48,7 @@ final class AuthRepositoryProvider
   }
 }
 
-String _$authRepositoryHash() => r'5fd961887298bc8c97b3883fa15aa236ba0eae45';
+String _$authRepositoryHash() => r'4fffb19a69e9bfcfa5661689c46e52781ad9fdbf';
 
 @ProviderFor(iniciarSesionUseCase)
 final iniciarSesionUseCaseProvider = IniciarSesionUseCaseProvider._();
@@ -90,7 +90,7 @@ final class IniciarSesionUseCaseProvider
 }
 
 String _$iniciarSesionUseCaseHash() =>
-    r'b3aa80a437a16e87c6f42a861916cc3d8149e0d4';
+    r'df03c4bf9d25e8c7cd55254b9361c1d8a7798599';
 
 @ProviderFor(iniciarSesionConGoogleUseCase)
 final iniciarSesionConGoogleUseCaseProvider =
@@ -139,7 +139,7 @@ final class IniciarSesionConGoogleUseCaseProvider
 }
 
 String _$iniciarSesionConGoogleUseCaseHash() =>
-    r'dfbfd9eed309b2f77388af91594222be969f5df1';
+    r'e96d314af30e3eacb14bc3f4c454bf1ef4bf5b9b';
 
 @ProviderFor(cerrarSesionUseCase)
 final cerrarSesionUseCaseProvider = CerrarSesionUseCaseProvider._();
@@ -181,7 +181,7 @@ final class CerrarSesionUseCaseProvider
 }
 
 String _$cerrarSesionUseCaseHash() =>
-    r'889e7cc82522e70438471dc43f03e2c141b030ce';
+    r'b79e2a13859cc0cc7691823b8f99626e8c5c40db';
 
 @ProviderFor(authState)
 final authStateProvider = AuthStateProvider._();
@@ -196,7 +196,7 @@ final class AuthStateProvider
         argument: null,
         retry: null,
         name: r'authStateProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -215,4 +215,4 @@ final class AuthStateProvider
   }
 }
 
-String _$authStateHash() => r'd2dbede99144c7ffca190ec6bdd4ee84b4201a1f';
+String _$authStateHash() => r'eec05dc35b70037aaf5ee332b274006ed51fd2c9';
