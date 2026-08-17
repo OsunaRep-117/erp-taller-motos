@@ -132,11 +132,13 @@ class AppDrawer extends ConsumerWidget {
                   title: 'Dashboard',
                   route: '/dashboard',
                 ),
-                tile(
-                  icon: Icons.analytics_outlined,
-                  title: 'Reportes',
-                  route: '/reportes',
-                ),
+                if (user != null &&
+                    AppPermissions.puedeAccederRuta(user.rol, '/reportes'))
+                  tile(
+                    icon: Icons.analytics_outlined,
+                    title: 'Reportes',
+                    route: '/reportes',
+                  ),
                 if (user != null &&
                     AppPermissions.puedeAccederRuta(user.rol, '/pos'))
                   tile(

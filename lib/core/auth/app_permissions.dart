@@ -35,6 +35,10 @@ class AppPermissions {
       return rol != RolEmpleado.mecanico;
     }
 
+    if (ruta.startsWith('/reportes')) {
+      return rol == RolEmpleado.admin || rol == RolEmpleado.supervisor;
+    }
+
     return true;
   }
 
